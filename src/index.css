@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Tajawal:wght@400;500;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Tajawal', sans-serif;
+  --font-display: 'Outfit', 'Tajawal', sans-serif;
+}
+
+body {
+  background-color: #fdfdfd;
+  margin: 0;
+  font-family: var(--font-sans);
+  direction: rtl;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(50%); /* Adjusted marquee direction for RTL */
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
