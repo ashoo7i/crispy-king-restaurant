@@ -1,6 +1,109 @@
 import React, { useEffect, useState } from 'react';
 import type { Category, MenuItem } from '../types';
 
+const FALLBACK_CATEGORIES: Category[] = [
+  {
+    id: 'cat-burgers',
+    name: 'برجر وبطاطس',
+    slug: 'burgers',
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80',
+  },
+  {
+    id: 'cat-chicken',
+    name: 'دجاج مقلي مقرمش',
+    slug: 'chicken',
+    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80',
+  },
+  {
+    id: 'cat-drinks',
+    name: 'المشروبات والحلويات',
+    slug: 'drinks',
+    image: 'https://images.unsplash.com/photo-1497534446932-c925b458314e?w=400&q=80',
+  }
+];
+
+const FALLBACK_MENU: MenuItem[] = [
+  {
+    id: 'item-1',
+    name: 'تويستر كينج الحار',
+    description: 'صدر دجاج مقرمش حار مع الخس والمايونيز والجبنة في خبز البريوش الفاخر.',
+    price: 24.0,
+    calories: 580,
+    image: 'https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=500&q=80',
+    categoryId: 'cat-burgers',
+    isAvailable: true,
+    options: [
+      { id: 'opt-1-1', menuItemId: 'item-1', name: 'حجم عادي', price: 0.0, category: 'SIZE' },
+      { id: 'opt-1-2', menuItemId: 'item-1', name: 'حجم كبير (مع بطاطس ومشروب ضخم)', price: 8.0, category: 'SIZE' },
+      { id: 'opt-1-3', menuItemId: 'item-1', name: 'جبنة شيدر إضافية', price: 2.0, category: 'ADDON' },
+      { id: 'opt-1-4', menuItemId: 'item-1', name: 'صوص رانش إضافي', price: 1.5, category: 'ADDON' },
+      { id: 'opt-1-5', menuItemId: 'item-1', name: 'بدون بصل', price: 0.0, category: 'EXCLUDE' }
+    ]
+  },
+  {
+    id: 'item-2',
+    name: 'دلو التوفير المقرمش (8 قطع)',
+    description: '8 قطع من الدجاج المقرمش الذهبي مع اختيارك من النكهة العادية أو الحارة، يقدم مع بطاطس عائلية.',
+    price: 79.0,
+    calories: 1450,
+    image: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&q=80',
+    categoryId: 'cat-chicken',
+    isAvailable: true,
+    options: [
+      { id: 'opt-2-1', menuItemId: 'item-2', name: 'دجاج حار', price: 0.0, category: 'SIZE' },
+      { id: 'opt-2-2', menuItemId: 'item-2', name: 'دجاج خلطة سرية عادية', price: 0.0, category: 'SIZE' },
+      { id: 'opt-2-3', menuItemId: 'item-2', name: 'إضافة صوص الثوم', price: 2.0, category: 'ADDON' }
+    ]
+  },
+  {
+    id: 'item-3',
+    name: 'برجر رويال لحم',
+    description: 'شريحة لحم مشوي على اللهب مع الطماطم، الخس، المخلل، وصوص رويال المدخن.',
+    price: 28.0,
+    calories: 620,
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80',
+    categoryId: 'cat-burgers',
+    isAvailable: true,
+    options: [
+      { id: 'opt-3-1', menuItemId: 'item-3', name: 'حجم عادي', price: 0.0, category: 'SIZE' },
+      { id: 'opt-3-2', menuItemId: 'item-3', name: 'حجم كبير مكس', price: 8.0, category: 'SIZE' },
+      { id: 'opt-3-3', menuItemId: 'item-3', name: 'شريحة لحم إضافية', price: 9.0, category: 'ADDON' },
+      { id: 'opt-3-4', menuItemId: 'item-3', name: 'جبنة إضافية', price: 2.0, category: 'ADDON' }
+    ]
+  },
+  {
+    id: 'item-4',
+    name: 'بطاطس مقرمشة ذهبية',
+    description: 'أصابع البطاطس المقلية المقرمشة والمملحة بشكل مثالي.',
+    price: 9.0,
+    calories: 320,
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
+    categoryId: 'cat-burgers',
+    isAvailable: true,
+    options: [
+      { id: 'opt-4-1', menuItemId: 'item-4', name: 'حجم وسط', price: 0.0, category: 'SIZE' },
+      { id: 'opt-4-2', menuItemId: 'item-4', name: 'حجم كبير جداً', price: 3.0, category: 'SIZE' },
+      { id: 'opt-4-3', menuItemId: 'item-4', name: 'إضافة بهارات حارة', price: 1.0, category: 'ADDON' },
+      { id: 'opt-4-4', menuItemId: 'item-4', name: 'إضافة صوص الجبنة', price: 2.0, category: 'ADDON' }
+    ]
+  },
+  {
+    id: 'item-5',
+    name: 'كولا مثلجة',
+    description: 'مشروب غازي منعش يقدم بارداً مع الثلج.',
+    price: 6.0,
+    calories: 140,
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80',
+    categoryId: 'cat-drinks',
+    isAvailable: true,
+    options: [
+      { id: 'opt-5-1', menuItemId: 'item-5', name: 'حجم وسط', price: 0.0, category: 'SIZE' },
+      { id: 'opt-5-2', menuItemId: 'item-5', name: 'حجم كبير', price: 2.0, category: 'SIZE' },
+      { id: 'opt-5-3', menuItemId: 'item-5', name: 'بدون ثلج', price: 0.0, category: 'EXCLUDE' }
+    ]
+  }
+];
+
 interface MenuSectionProps {
   onSelectItem: (item: MenuItem) => void;
 }
@@ -25,7 +128,10 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem }) => {
           setActiveSlug(catsData[0].slug);
         }
       } catch (error) {
-        console.error('Failed to load menu data:', error);
+        console.warn('Backend server unreachable, using local fallback menu data:', error);
+        setCategories(FALLBACK_CATEGORIES);
+        setMenuItems(FALLBACK_MENU);
+        setActiveSlug(FALLBACK_CATEGORIES[0].slug);
       } finally {
         setLoading(false);
       }
