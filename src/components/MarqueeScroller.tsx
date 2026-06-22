@@ -27,7 +27,7 @@ const FOOD_ITEMS: FoodHighlight[] = [
   },
   {
     name: 'حلقات البصل الذهبية 🧅',
-    image: 'https://images.unsplash.com/photo-1639024471283-2bc7b3c6a267?w=400&q=80',
+    image: 'https://images.unsplash.com/photo-1585109649139-366815a0d713?w=400&q=80',
   },
   {
     name: 'سلطة كولسلو طازجة 🥗',

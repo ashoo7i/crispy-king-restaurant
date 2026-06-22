@@ -87,7 +87,7 @@ function App() {
       <main className="flex-1">
         {activePage === 'home' && (
           <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <HeroSection />
+            <HeroSection onOrderClick={() => onNavigate('menu')} />
             <div className="mt-8">
               <MarqueeScroller />
             </div>
