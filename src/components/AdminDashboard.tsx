@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../config';
-import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut } from 'lucide-react';
+import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut, Bell, Volume2 } from 'lucide-react';
+import { playNewOrderAlert } from '../utils/audio';
 
 interface AdminDashboardProps {
   onBackToMenu: () => void;
@@ -64,6 +65,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  
+  // Notification states
+  const [newOrderToast, setNewOrderToast] = useState<any | null>(null);
+  const [notificationPermission, setNotificationPermission] = useState<string>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
 
   useEffect(() => {
     // Check session storage for existing auth
@@ -77,10 +84,55 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders`);
       const data = await res.json();
+      
+      // Check for new orders to trigger sound/notifications
+      if (orders.length > 0) {
+        const currentIds = new Set(orders.map(o => o.id));
+        const newOrders = data.filter((o: any) => !currentIds.has(o.id));
+        
+        if (newOrders.length > 0) {
+          playNewOrderAlert(); // Play double ping sound
+          
+          // Trigger browser native push notification
+          if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+            new Notification('👑 طلب جديد وارد!', {
+              body: `العميل: ${newOrders[0].customerName}\nالمجموع: ${newOrders[0].totalPrice} ريال`,
+              tag: newOrders[0].id
+            });
+          }
+          
+          // Trigger custom slide-in UI toast
+          setNewOrderToast(newOrders[0]);
+          setTimeout(() => setNewOrderToast(null), 6000);
+        }
+      }
+      
       setOrders(data);
     } catch (err) {
       console.warn('Backend server offline, loading local localStorage orders:', err);
       const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const activeLocal = localOrders.length > 0 ? localOrders : MOCK_ORDERS;
+      
+      // Also diff for offline local orders
+      if (orders.length > 0) {
+        const currentIds = new Set(orders.map(o => o.id));
+        const newOrders = activeLocal.filter((o: any) => !currentIds.has(o.id));
+        
+        if (newOrders.length > 0) {
+          playNewOrderAlert();
+          
+          if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+            new Notification('👑 طلب جديد وارد (محلي)!', {
+              body: `العميل: ${newOrders[0].customerName}\nالمجموع: ${newOrders[0].totalPrice} ريال`,
+              tag: newOrders[0].id
+            });
+          }
+          
+          setNewOrderToast(newOrders[0]);
+          setTimeout(() => setNewOrderToast(null), 6000);
+        }
+      }
+      
       setOrders(localOrders.length > 0 ? localOrders : MOCK_ORDERS);
     } finally {
       setLoading(false);
@@ -285,6 +337,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
           <p className="text-sm text-gray-400 mt-1">إدارة ومراقبة الطلبات الحية وتحديث حالة التسليم للعملاء</p>
         </div>
         <div className="flex flex-wrap gap-2.5">
+          {typeof Notification !== 'undefined' && notificationPermission !== 'granted' && (
+            <button 
+              onClick={async () => {
+                const res = await Notification.requestPermission();
+                setNotificationPermission(res);
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 border border-yellow-800/80 hover:border-yellow-700 text-yellow-500 rounded-full font-bold text-xs bg-yellow-950/20 shadow-xs transition-colors"
+            >
+              <Bell className="w-3.5 h-3.5" /> تفعيل الإشعارات 🔔
+            </button>
+          )}
           <button 
             onClick={fetchOrders} 
             className="flex items-center gap-2 px-4 py-2.5 border border-gray-800 hover:border-gray-700 text-gray-300 rounded-full font-bold text-xs bg-gray-900 shadow-xs transition-colors"
@@ -536,6 +599,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
               </div>
             </form>
           </div>
+        </div>
+      )}
+      {/* New Order Toast Alert */}
+      {newOrderToast && (
+        <div className="fixed bottom-6 left-6 z-50 max-w-sm bg-gray-900 border-2 border-red-600 rounded-3xl p-5 shadow-2xl animate-in slide-in-from-bottom duration-300 flex items-center gap-4 text-right" dir="rtl">
+          <div className="w-12 h-12 bg-red-955/20 text-red-500 rounded-2xl flex items-center justify-center shrink-0 border border-red-900/50">
+            <Volume2 className="w-6 h-6 animate-bounce" />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-black text-sm text-white">👑 طلب جديد وارد للتو!</h4>
+            <p className="text-xs text-gray-400 mt-1 font-bold">العميل: {newOrderToast.customerName}</p>
+            <p className="text-xs text-red-500 font-bold mt-0.5">{newOrderToast.totalPrice} ريال | معرف: {newOrderToast.id}</p>
+          </div>
+          <button 
+            onClick={() => {
+              setSelectedOrder(newOrderToast);
+              setNewOrderToast(null);
+            }}
+            className="text-xs bg-red-600 text-white font-bold px-3.5 py-2 rounded-xl hover:bg-red-700 transition-colors"
+          >
+            عرض
+          </button>
         </div>
       )}
     </div>

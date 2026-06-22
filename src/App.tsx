@@ -9,6 +9,7 @@ import { CheckoutForm } from './components/CheckoutForm';
 import { OrderTracker } from './components/OrderTracker';
 import { AdminDashboard } from './components/AdminDashboard';
 import type { CartItem, MenuItem, CustomizationOption } from './types';
+import { playSuccessPing } from './utils/audio';
 
 function App() {
   const [activePage, setActivePage] = useState<string>('home');
@@ -63,6 +64,7 @@ function App() {
   };
 
   const handleOrderSuccess = (orderId: string) => {
+    playSuccessPing(); // Play iPhone-like ping sound
     setActiveOrderId(orderId);
     setCart([]);
     setIsCartOpen(false);
