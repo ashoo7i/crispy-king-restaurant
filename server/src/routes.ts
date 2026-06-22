@@ -127,4 +127,44 @@ router.patch('/orders/:id/status', async (req: Request, res: Response) => {
   }
 });
 
+// Admin Login Endpoint
+router.post('/admin/login', async (req: Request, res: Response) => {
+  const { passcode } = req.body;
+  try {
+    const dbPasscode = await prisma.setting.findUnique({
+      where: { key: 'admin_passcode' }
+    });
+    const validPasscode = dbPasscode?.value || 'admin123';
+    if (passcode === validPasscode) {
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ success: false, error: 'كلمة المرور غير صحيحة' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'فشل التحقق من كلمة المرور' });
+  }
+});
+
+// Admin Change Password Endpoint
+router.post('/admin/change-password', async (req: Request, res: Response) => {
+  const { currentPasscode, newPasscode } = req.body;
+  try {
+    const dbPasscode = await prisma.setting.findUnique({
+      where: { key: 'admin_passcode' }
+    });
+    const validPasscode = dbPasscode?.value || 'admin123';
+    if (currentPasscode !== validPasscode) {
+      return res.status(401).json({ success: false, error: 'كلمة المرور الحالية غير صحيحة' });
+    }
+    await prisma.setting.upsert({
+      where: { key: 'admin_passcode' },
+      update: { value: newPasscode },
+      create: { key: 'admin_passcode', value: newPasscode }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'فشل تغيير كلمة المرور' });
+  }
+});
+
 export default router;

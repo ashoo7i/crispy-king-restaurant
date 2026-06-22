@@ -60,3 +60,8 @@ model OrderItem {
   price          Float
   customizations String   // JSON string of selected options
 }
+
+model Setting {
+  key   String @id
+  value String
+}

@@ -138,6 +138,19 @@ async function main() {
     ],
   });
 
+  // Seed default admin passcode if it doesn't exist
+  const existingPasscode = await prisma.setting.findUnique({
+    where: { key: 'admin_passcode' }
+  });
+  if (!existingPasscode) {
+    await prisma.setting.create({
+      data: {
+        key: 'admin_passcode',
+        value: 'admin123'
+      }
+    });
+  }
+
   console.log('Database seeded successfully.');
 }
 

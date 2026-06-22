@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw } from 'lucide-react';
+import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut } from 'lucide-react';
 
 interface AdminDashboardProps {
   onBackToMenu: () => void;
@@ -14,7 +14,7 @@ const MOCK_ORDERS = [
     address: 'صنعاء، شارع حدة، عمارة الأمل الدور الثالث',
     status: 'PENDING',
     totalPrice: 4300,
-    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(), // 10 mins ago
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
     items: [
       {
         id: 'oi-1',
@@ -33,7 +33,7 @@ const MOCK_ORDERS = [
     address: 'استلام من الفرع الرئيسي',
     status: 'PREPARING',
     totalPrice: 12500,
-    createdAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(), // 35 mins ago
+    createdAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
     items: [
       {
         id: 'oi-2',
@@ -43,39 +43,34 @@ const MOCK_ORDERS = [
         menuItem: { name: 'دلو التوفير المقرمش (8 قطع)' }
       }
     ]
-  },
-  {
-    id: 'CR-9042',
-    customerName: 'محمد حسين',
-    customerPhone: '711xxxxxx',
-    deliveryType: 'DELIVERY',
-    address: 'عدن، كريتر، بجانب البريد العام',
-    status: 'COMPLETED',
-    totalPrice: 5500,
-    createdAt: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
-    items: [
-      {
-        id: 'oi-3',
-        quantity: 1,
-        price: 4000,
-        customizations: JSON.stringify([{ name: 'شريحة لحم إضافية' }]),
-        menuItem: { name: 'برجر رويال لحم' }
-      },
-      {
-        id: 'oi-4',
-        quantity: 1,
-        price: 1500,
-        customizations: JSON.stringify([]),
-        menuItem: { name: 'بطاطس مقرمشة ذهبية' }
-      }
-    ]
   }
 ];
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passcode, setPasscode] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [shake, setShake] = useState(false);
+  
+  // Change password modal state
+  const [isChangeModalOpen, setIsChangeModalOpen] = useState(false);
+  const [currentPass, setCurrentPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [modalError, setModalError] = useState('');
+  const [modalSuccess, setModalSuccess] = useState('');
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
+  useEffect(() => {
+    // Check session storage for existing auth
+    const auth = sessionStorage.getItem('admin_authenticated');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const fetchOrders = async () => {
     try {
@@ -88,6 +83,105 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchOrders();
+      const interval = setInterval(fetchOrders, 6000);
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  // Handle authentication login
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    try {
+      const res = await fetch('http://localhost:3001/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passcode })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('admin_authenticated', 'true');
+      } else {
+        throw new Error(data.error || 'رمز الدخول غير صحيح');
+      }
+    } catch (err: any) {
+      // Fallback to local storage passcode check
+      const localPasscode = localStorage.getItem('admin_passcode') || 'admin123';
+      if (passcode === localPasscode) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('admin_authenticated', 'true');
+      } else {
+        setLoginError('رمز المرور المدخل غير صحيح!');
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+      }
+    }
+  };
+
+  // Handle password change
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setModalError('');
+    setModalSuccess('');
+
+    if (newPass !== confirmPass) {
+      setModalError('كلمات المرور الجديدة غير متطابقة!');
+      return;
+    }
+    if (newPass.length < 4) {
+      setModalError('يجب أن تكون كلمة المرور مكونة من 4 رموز على الأقل!');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3001/api/admin/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPasscode: currentPass, newPasscode: newPass })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        localStorage.setItem('admin_passcode', newPass); // local sync
+        setModalSuccess('تم تغيير كلمة المرور بنجاح!');
+        setTimeout(() => {
+          setIsChangeModalOpen(false);
+          setCurrentPass('');
+          setNewPass('');
+          setConfirmPass('');
+          setModalSuccess('');
+        }, 1500);
+      } else {
+        throw new Error(data.error || 'فشل التغيير');
+      }
+    } catch (err) {
+      // Fallback update in local storage
+      const localPass = localStorage.getItem('admin_passcode') || 'admin123';
+      if (currentPass === localPass) {
+        localStorage.setItem('admin_passcode', newPass);
+        setModalSuccess('تم تغيير كلمة المرور محلياً بنجاح!');
+        setTimeout(() => {
+          setIsChangeModalOpen(false);
+          setCurrentPass('');
+          setNewPass('');
+          setConfirmPass('');
+          setModalSuccess('');
+        }, 1500);
+      } else {
+        setModalError('كلمة المرور الحالية غير صحيحة!');
+      }
+    }
+  };
+
+  // Logout function
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('admin_authenticated');
   };
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
@@ -103,7 +197,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
       }
     } catch (err) {
       console.error('Failed to update status on server:', err);
-      // Offline local update fallback
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
@@ -111,11 +204,57 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 6000); // Live poll every 6 seconds
-    return () => clearInterval(interval);
-  }, []);
+  // Render Login Gate
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <div className={`w-full max-w-md bg-white p-8 rounded-3xl border border-gray-100 shadow-xl text-center space-y-6 ${shake ? 'animate-bounce' : ''}`}>
+          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto border-2 border-red-100 animate-pulse">
+            <Lock className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-gray-900">شاشة التحقق والأمان 🔐</h2>
+            <p className="text-xs text-gray-400 font-bold mt-1.5">الوصول إلى لوحة إدارة الطلبات محمي بكلمة مرور</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <input 
+                type="password"
+                placeholder="أدخل كلمة المرور (الافتراضية: admin123)"
+                value={passcode}
+                onChange={(e) => setPasscode(e.target.value)}
+                className="w-full text-center px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-sm bg-gray-50"
+                required
+              />
+            </div>
+
+            {loginError && (
+              <div className="text-xs text-red-600 bg-red-50 py-2.5 px-4 rounded-xl font-bold flex items-center justify-center gap-1.5 border border-red-200">
+                <ShieldAlert className="w-3.5 h-3.5" /> {loginError}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button 
+                type="button"
+                onClick={onBackToMenu}
+                className="w-1/2 border border-gray-200 text-gray-600 py-3 rounded-2xl hover:bg-gray-50 font-bold text-xs transition-colors"
+              >
+                العودة للمنيو
+              </button>
+              <button 
+                type="submit"
+                className="w-1/2 bg-red-600 text-white py-3 rounded-2xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-200"
+              >
+                تأكيد الدخول
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -125,7 +264,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     );
   }
 
-  // Stats calculation
   const totalRevenue = orders.filter(o => o.status === 'COMPLETED').reduce((sum, o) => sum + o.totalPrice, 0);
   const activeOrdersCount = orders.filter(o => o.status !== 'COMPLETED').length;
   const completedOrdersCount = orders.filter(o => o.status === 'COMPLETED').length;
@@ -139,12 +277,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
           <h2 className="text-3xl font-black text-gray-900">لوحة تحكم كرسبي كينج 👑</h2>
           <p className="text-sm text-gray-500 mt-1">إدارة ومراقبة الطلبات الحية وتحديث حالة التسليم للعملاء</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2.5">
           <button 
             onClick={fetchOrders} 
             className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-bold text-xs bg-white shadow-xs transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" /> تحديث البيانات
+          </button>
+          <button 
+            onClick={() => setIsChangeModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-bold text-xs bg-white shadow-xs transition-colors"
+          >
+            <KeyRound className="w-3.5 h-3.5" /> تغيير رمز المرور
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-bold text-xs transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" /> خروج
           </button>
           <button 
             onClick={onBackToMenu}
@@ -190,8 +340,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
 
       {/* Orders details grid splitting layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Orders list table */}
         <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 shadow-xs overflow-hidden">
           <div className="p-6 border-b border-gray-100 bg-gray-50/50">
             <h3 className="font-bold text-gray-900 text-lg">الطلبات الواردة ({orders.length})</h3>
@@ -255,13 +403,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
           </div>
         </div>
 
-        {/* Selected Order Details and controls */}
+        {/* Selected Order Details */}
         <div className="lg:col-span-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-xs h-fit space-y-6">
           <h3 className="font-bold text-gray-900 text-lg border-b border-gray-100 pb-3 mb-4">تفاصيل الطلب المحدد</h3>
-          
           {selectedOrder ? (
             <div className="space-y-6 animate-in fade-in duration-200">
-              {/* Order Info */}
               <div className="text-sm space-y-2.5">
                 <div><span className="text-gray-400 font-bold">معرف الطلب:</span> <span className="font-display font-black text-gray-800">{selectedOrder.id}</span></div>
                 <div><span className="text-gray-400 font-bold">العميل:</span> <span className="font-bold text-gray-800">{selectedOrder.customerName}</span></div>
@@ -270,7 +416,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                 <div><span className="text-gray-400 font-bold">العنوان:</span> <p className="font-bold text-gray-700 text-xs mt-1 bg-gray-50 p-2.5 rounded-lg leading-relaxed">{selectedOrder.address}</p></div>
               </div>
 
-              {/* Items List */}
               <div className="border-t border-gray-100 pt-4 space-y-3">
                 <span className="text-xs text-gray-400 font-black block">الوجبات المطلوبة:</span>
                 {selectedOrder.items.map((item: any) => {
@@ -293,50 +438,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                 })}
               </div>
 
-              {/* Status Update Controls */}
               <div className="border-t border-gray-100 pt-4 space-y-3">
                 <span className="text-xs text-gray-400 font-black block">تغيير حالة الطلب الحية:</span>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  <button 
-                    onClick={() => updateOrderStatus(selectedOrder.id, 'PENDING')} 
-                    className={`p-2.5 rounded-xl border font-bold transition-all ${
-                      selectedOrder.status === 'PENDING' 
-                        ? 'bg-yellow-500 text-white border-yellow-500' 
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
-                  >
-                    قيد الانتظار
-                  </button>
-                  <button 
-                    onClick={() => updateOrderStatus(selectedOrder.id, 'PREPARING')} 
-                    className={`p-2.5 rounded-xl border font-bold transition-all ${
-                      selectedOrder.status === 'PREPARING' 
-                        ? 'bg-orange-500 text-white border-orange-500' 
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
-                  >
-                    بدء التحضير
-                  </button>
-                  <button 
-                    onClick={() => updateOrderStatus(selectedOrder.id, 'OUT_FOR_DELIVERY')} 
-                    className={`p-2.5 rounded-xl border font-bold transition-all ${
-                      selectedOrder.status === 'OUT_FOR_DELIVERY' 
-                        ? 'bg-blue-500 text-white border-blue-500' 
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
-                  >
-                    خروج للتوصيل
-                  </button>
-                  <button 
-                    onClick={() => updateOrderStatus(selectedOrder.id, 'COMPLETED')} 
-                    className={`p-2.5 rounded-xl border font-bold transition-all ${
-                      selectedOrder.status === 'COMPLETED' 
-                        ? 'bg-green-500 text-white border-green-500' 
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
-                  >
-                    تم التسليم
-                  </button>
+                  {['PENDING', 'PREPARING', 'OUT_FOR_DELIVERY', 'COMPLETED'].map((status) => {
+                    const labels: Record<string, string> = { PENDING: 'قيد الانتظار', PREPARING: 'بدء التحضير', OUT_FOR_DELIVERY: 'خروج للتوصيل', COMPLETED: 'تم التسليم' };
+                    const activeColors: Record<string, string> = { PENDING: 'bg-yellow-500 text-white border-yellow-500', PREPARING: 'bg-orange-500 text-white border-orange-500', OUT_FOR_DELIVERY: 'bg-blue-500 text-white border-blue-500', COMPLETED: 'bg-green-500 text-white border-green-500' };
+                    return (
+                      <button 
+                        key={status}
+                        onClick={() => updateOrderStatus(selectedOrder.id, status)} 
+                        className={`p-2.5 rounded-xl border font-bold transition-all ${
+                          selectedOrder.status === status 
+                            ? activeColors[status] 
+                            : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                        }`}
+                      >
+                        {labels[status]}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -345,6 +466,70 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
           )}
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {isChangeModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md p-8 rounded-3xl border border-gray-100 shadow-2xl space-y-5 text-right" dir="rtl">
+            <h3 className="text-xl font-black text-gray-900 border-b border-gray-100 pb-3">تغيير رمز مرور الإدارة 🔑</h3>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">رمز المرور الحالي</label>
+                <input 
+                  type="password"
+                  value={currentPass}
+                  onChange={(e) => setCurrentPass(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">رمز المرور الجديد</label>
+                <input 
+                  type="password"
+                  value={newPass}
+                  onChange={(e) => setNewPass(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">تأكيد رمز المرور الجديد</label>
+                <input 
+                  type="password"
+                  value={confirmPass}
+                  onChange={(e) => setConfirmPass(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+
+              {modalError && <p className="text-xs text-red-600 bg-red-50 p-2.5 rounded-xl border border-red-200 font-bold">{modalError}</p>}
+              {modalSuccess && <p className="text-xs text-green-600 bg-green-50 p-2.5 rounded-xl border border-green-200 font-bold">{modalSuccess}</p>}
+
+              <div className="flex gap-3 pt-2">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setIsChangeModalOpen(false);
+                    setModalError('');
+                    setModalSuccess('');
+                  }}
+                  className="w-1/2 border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 font-bold text-xs transition-colors"
+                >
+                  إلغاء
+                </button>
+                <button 
+                  type="submit"
+                  className="w-1/2 bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-200"
+                >
+                  حفظ التغييرات
+                  </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
