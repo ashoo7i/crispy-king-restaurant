@@ -7,6 +7,7 @@ import { CustomizationModal } from './components/CustomizationModal';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutForm } from './components/CheckoutForm';
 import { OrderTracker } from './components/OrderTracker';
+import { AdminDashboard } from './components/AdminDashboard';
 import type { CartItem, MenuItem, CustomizationOption } from './types';
 
 function App() {
@@ -116,6 +117,10 @@ function App() {
             onBackToMenu={() => onNavigate('menu')}
           />
         )}
+
+        {activePage === 'admin' && (
+          <AdminDashboard onBackToMenu={() => onNavigate('menu')} />
+        )}
       </main>
 
       <CartDrawer 
@@ -135,8 +140,14 @@ function App() {
       )}
 
       <footer className="bg-gray-900 text-white py-12 mt-20 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 text-center sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 text-center sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-400">© 2026 كرسبي كينج. جميع الحقوق محفوظة. | Developed by Eng. Ashraf Qusailah</p>
+          <button 
+            onClick={() => onNavigate('admin')}
+            className="text-xs text-gray-500 hover:text-red-500 transition-colors"
+          >
+            🔐 لوحة الإدارة
+          </button>
         </div>
       </footer>
     </div>

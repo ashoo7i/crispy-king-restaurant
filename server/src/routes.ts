@@ -9,6 +9,23 @@ function generateOrderId() {
   return 'CR-' + Math.floor(1000 + Math.random() * 9000);
 }
 
+// Get All Orders (for admin panel)
+router.get('/orders', async (req: Request, res: Response) => {
+  try {
+    const orders = await prisma.order.findMany({
+      include: {
+        items: {
+          include: { menuItem: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
 // Get Categories
 router.get('/categories', async (req: Request, res: Response) => {
   try {
