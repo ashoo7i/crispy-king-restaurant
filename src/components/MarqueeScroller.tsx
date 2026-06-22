@@ -1,87 +1,73 @@
-interface Logo {
+
+interface FoodHighlight {
   name: string;
-  src: string;
-  gradient: {
-    from: string;
-    to: string;
-  };
+  image: string;
 }
 
-const LOGOS: Logo[] = [
+const FOOD_ITEMS: FoodHighlight[] = [
   {
-    name: 'Procure',
-    src: 'https://cdn.svgl.app/library/procure.svg',
-    gradient: { from: '#3b82f6', to: '#1d4ed8' }, // blue gradient
+    name: 'برجر كينج الحار 🍔',
+    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80',
   },
   {
-    name: 'Shopify',
-    src: 'https://cdn.svgl.app/library/shopify.svg',
-    gradient: { from: '#f59e0b', to: '#d97706' }, // yellow gradient
+    name: 'دجاج كرسبي مقرمش 🍗',
+    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80',
   },
   {
-    name: 'Blender',
-    src: 'https://cdn.svgl.app/library/blender.svg',
-    gradient: { from: '#2563eb', to: '#1d4ed8' }, // blue gradient
+    name: 'بطاطس مقرمشة ذهبية 🍟',
+    image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80',
   },
   {
-    name: 'Figma',
-    src: 'https://cdn.svgl.app/library/figma.svg',
-    gradient: { from: '#a855f7', to: '#7e22ce' }, // purple gradient
+    name: 'تويستر دجاج سبايسي 🌯',
+    image: 'https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=400&q=80',
   },
   {
-    name: 'Spotify',
-    src: 'https://cdn.svgl.app/library/spotify.svg',
-    gradient: { from: '#ec4899', to: '#be185d' }, // pink/red gradient
+    name: 'كولا مثلجة ومنعشة 🥤',
+    image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=80',
   },
   {
-    name: 'Lottielab',
-    src: 'https://cdn.svgl.app/library/lottielab.svg',
-    gradient: { from: '#eab308', to: '#22c55e' }, // yellow/green gradient
+    name: 'حلقات البصل الذهبية 🧅',
+    image: 'https://images.unsplash.com/photo-1639024471283-2bc7b3c6a267?w=400&q=80',
   },
   {
-    name: 'Google Cloud',
-    src: 'https://cdn.svgl.app/library/google-cloud.svg',
-    gradient: { from: '#38bdf8', to: '#0284c7' }, // light blue
+    name: 'سلطة كولسلو طازجة 🥗',
+    image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400&q=80',
   },
   {
-    name: 'Bing',
-    src: 'https://cdn.svgl.app/library/bing.svg',
-    gradient: { from: '#06b6d4', to: '#0f766e' }, // cyan/teal
-  },
+    name: 'آيس كريم الشوكولاتة 🍦',
+    image: 'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=400&q=80',
+  }
 ];
 
-// Double the list for seamless infinite looping
-const DOUBLE_LOGOS = [...LOGOS, ...LOGOS];
+const DOUBLE_FOOD_ITEMS = [...FOOD_ITEMS, ...FOOD_ITEMS];
 
 export const MarqueeScroller = () => {
   return (
     <div 
-      className="relative w-full overflow-hidden py-4 select-none"
+      className="relative w-full overflow-hidden py-6 select-none"
       style={{
         maskImage: 'linear-gradient(to right, transparent, white 15%, white 85%, transparent)',
         WebkitMaskImage: 'linear-gradient(to right, transparent, white 15%, white 85%, transparent)',
       }}
     >
       <div className="animate-marquee flex gap-6">
-        {DOUBLE_LOGOS.map((logo, index) => (
+        {DOUBLE_FOOD_ITEMS.map((item, index) => (
           <div
-            key={`${logo.name}-${index}`}
-            className="group relative h-24 w-40 shrink-0 flex items-center justify-center rounded-full bg-white border border-slate-200/60 shadow-sm hover:border-slate-300 transition-all overflow-hidden"
+            key={`${item.name}-${index}`}
+            className="group relative h-32 w-52 shrink-0 flex items-end justify-center rounded-3xl overflow-hidden shadow-lg border border-slate-100/50 hover:scale-105 transition-all duration-300"
           >
-            {/* Hover Gradient Overlay */}
-            <div
-              className="absolute inset-0 opacity-0 scale-150 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none"
-              style={{
-                background: `linear-gradient(135deg, ${logo.gradient.from}, ${logo.gradient.to})`,
-              }}
-            />
-            
-            {/* Logo Image */}
+            {/* Background Image */}
             <img
-              src={logo.src}
-              alt={logo.name}
-              className="h-7 w-auto max-w-[100px] object-contain relative z-10 transition-all duration-300 group-hover:brightness-0 group-hover:invert"
+              src={item.image}
+              alt={item.name}
+              className="w-full h-full object-cover absolute inset-0 group-hover:scale-110 transition-transform duration-500"
             />
+            {/* Dark overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
+            {/* Text Label */}
+            <span className="relative z-20 text-white font-bold text-xs p-4 w-full text-center tracking-wide leading-tight">
+              {item.name}
+            </span>
           </div>
         ))}
       </div>

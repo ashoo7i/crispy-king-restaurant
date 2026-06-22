@@ -15,6 +15,14 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
   const [address, setAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Payment states
+  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'CARD' | 'WALLET'>('CASH');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [walletType, setWalletType] = useState('الكريمي جوال');
+  const [walletAccount, setWalletAccount] = useState('');
+
   const subTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryFee = deliveryType === 'DELIVERY' ? 12 : 0;
   const grandTotal = subTotal + deliveryFee;
@@ -24,6 +32,15 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
     if (!name || !phone || (deliveryType === 'DELIVERY' && !address)) return;
 
     setSubmitting(true);
+    
+    // Format payment information string for tracking/receipt details
+    let paymentDetailsText: string = paymentMethod;
+    if (paymentMethod === 'CARD') {
+      paymentDetailsText = `بطاقة ائتمانية (ينتهي بـ ${cardNumber.slice(-4)})`;
+    } else if (paymentMethod === 'WALLET') {
+      paymentDetailsText = `محفظة (${walletType} - ${walletAccount})`;
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/orders`, {
         method: 'POST',
@@ -34,6 +51,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
           deliveryType,
           address: deliveryType === 'DELIVERY' ? address : 'استلام من الفرع الرئيسي',
           totalPrice: grandTotal,
+          paymentMethod: paymentDetailsText,
           items: cart.map(item => ({
             menuItemId: item.menuItemId,
             quantity: item.quantity,
@@ -55,6 +73,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
             address: deliveryType === 'DELIVERY' ? address : 'استلام من الفرع الرئيسي',
             status: 'PENDING',
             totalPrice: grandTotal,
+            paymentMethod: paymentDetailsText,
             createdAt: new Date().toISOString(),
             items: cart.map((item, idx) => ({
               id: `oi-${idx}`,
@@ -86,6 +105,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
         address: deliveryType === 'DELIVERY' ? address : 'استلام من الفرع الرئيسي',
         status: 'PENDING',
         totalPrice: grandTotal,
+        paymentMethod: paymentDetailsText,
         createdAt: new Date().toISOString(),
         items: cart.map((item, idx) => ({
           id: `oi-${idx}`,
@@ -163,7 +183,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="الاسم بالكامل"
-              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-sm"
+              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-660 transition-all text-sm"
             />
           </div>
 
@@ -174,7 +194,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
               required
               value={phone}
               onChange={e => setPhone(e.target.value)}
-              placeholder="05xxxxxxx"
+              placeholder="77xxxxxxx"
               className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-sm text-right"
               dir="ltr"
             />
@@ -194,12 +214,131 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
             </div>
           )}
 
+          {/* Payment Method Selector Section */}
+          <div className="border-t border-gray-100 pt-6 space-y-4">
+            <label className="block text-sm font-bold text-gray-800 mb-1">طريقة الدفع</label>
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('CASH')}
+                className={`py-3 rounded-2xl font-bold transition-all border-2 text-xs flex flex-col items-center justify-center gap-1.5 ${
+                  paymentMethod === 'CASH'
+                    ? 'border-red-600 bg-red-50/50 text-red-600'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+              >
+                <span className="text-lg">💵</span>
+                <span>نقداً عند الاستلام</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('CARD')}
+                className={`py-3 rounded-2xl font-bold transition-all border-2 text-xs flex flex-col items-center justify-center gap-1.5 ${
+                  paymentMethod === 'CARD'
+                    ? 'border-red-600 bg-red-50/50 text-red-600'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+              >
+                <span className="text-lg">💳</span>
+                <span>بطاقة ائتمانية</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod('WALLET')}
+                className={`py-3 rounded-2xl font-bold transition-all border-2 text-xs flex flex-col items-center justify-center gap-1.5 ${
+                  paymentMethod === 'WALLET'
+                    ? 'border-red-600 bg-red-50/50 text-red-600'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                }`}
+              >
+                <span className="text-lg">📱</span>
+                <span>محفظة إلكترونية</span>
+              </button>
+            </div>
+
+            {/* Cash instructions */}
+            {paymentMethod === 'CASH' && (
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-xs text-gray-500 font-bold text-center leading-relaxed">
+                سيتم سداد المبلغ بالكامل نقدًا عند استلام الوجبة من مندوب التوصيل أو الفرع بالهناء والشفاء.
+              </div>
+            )}
+
+            {/* Credit Card Mock Form */}
+            {paymentMethod === 'CARD' && (
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-3">
+                <p className="text-[10px] text-amber-700 bg-amber-50 border border-amber-100/50 p-2.5 rounded-xl text-center font-bold">
+                  ⚠️ وضع الدفع التجريبي نشط: الرجاء إدخال أي أرقام وهمية لتأكيد العملية.
+                </p>
+                <div>
+                  <input
+                    type="text"
+                    required
+                    maxLength={19}
+                    placeholder="رقم البطاقة (16 رقم)"
+                    value={cardNumber}
+                    onChange={e => setCardNumber(e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim())}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-center font-display"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    required
+                    placeholder="تاريخ الانتهاء MM/YY"
+                    value={cardExpiry}
+                    onChange={e => setCardExpiry(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-center font-display"
+                  />
+                  <input
+                    type="password"
+                    required
+                    maxLength={3}
+                    placeholder="رمز التحقق CVV"
+                    value={cardCvv}
+                    onChange={e => setCardCvv(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-center font-display"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Electronic Wallet Mock Form */}
+            {paymentMethod === 'WALLET' && (
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 mb-1.5">اختر المحفظة اليمنيّة</label>
+                  <select
+                    value={walletType}
+                    onChange={e => setWalletType(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs font-bold text-gray-700"
+                  >
+                    <option value="جوال الكريمي">جوال الكريمي (Kuraimi)</option>
+                    <option value="محفظة حاسب">حاسب (Haseb)</option>
+                    <option value="محفظة كاش">كاش (Kuraimi Cash)</option>
+                    <option value="إم فلوس">إم فلوس (M-Floos)</option>
+                    <option value="محفظة جيب">جيب (Jeeb)</option>
+                  </select>
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    required
+                    placeholder="رقم الهاتف أو الحساب المرتبط بالمحفظة"
+                    value={walletAccount}
+                    onChange={e => setWalletAccount(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-right font-display"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={submitting}
             className="w-full bg-red-600 text-white font-bold py-4 rounded-2xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 text-sm tracking-wide disabled:cursor-not-allowed"
           >
-            {submitting ? 'جاري إرسال طلبك للتحضير...' : 'تأكيد الطلب والدفع عند الاستلام'}
+            {submitting ? 'جاري إرسال طلبك للتحضير...' : 'تأكيد الطلب وإرساله للمطبخ'}
           </button>
         </form>
 

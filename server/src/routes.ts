@@ -50,7 +50,7 @@ router.get('/menu', async (req: Request, res: Response) => {
 
 // Create Order
 router.post('/orders', async (req: Request, res: Response) => {
-  const { customerName, customerPhone, deliveryType, address, totalPrice, items } = req.body;
+  const { customerName, customerPhone, deliveryType, address, totalPrice, paymentMethod, items } = req.body;
 
   if (!customerName || !customerPhone || !deliveryType || !totalPrice || !items || items.length === 0) {
     return res.status(400).json({ error: 'Missing required order details' });
@@ -67,6 +67,7 @@ router.post('/orders', async (req: Request, res: Response) => {
         address,
         status: 'PENDING',
         totalPrice,
+        paymentMethod: paymentMethod || 'CASH',
         items: {
           create: items.map((item: any) => ({
             menuItemId: item.menuItemId,

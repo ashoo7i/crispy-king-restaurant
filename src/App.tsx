@@ -69,6 +69,11 @@ function App() {
     onNavigate('tracking');
   };
 
+  const handleTrackOrder = (orderId: string) => {
+    setActiveOrderId(orderId);
+    onNavigate('tracking');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Navbar 
@@ -76,6 +81,7 @@ function App() {
         onCartToggle={() => setIsCartOpen(!isCartOpen)} 
         onNavigate={onNavigate}
         activePage={activePage}
+        onTrackOrder={handleTrackOrder}
       />
 
       <main className="flex-1">
@@ -128,7 +134,10 @@ function App() {
         onClose={() => setIsCartOpen(false)}
         cart={cart}
         onUpdateQuantity={handleUpdateQuantity}
-        onCheckout={() => onNavigate('checkout')}
+        onCheckout={() => {
+          onNavigate('checkout');
+          setIsCartOpen(false);
+        }}
       />
 
       {selectedItem && (

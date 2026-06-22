@@ -46,6 +46,7 @@ model Order {
   address       String?
   status        String      // PENDING, PREPARING, OUT_FOR_DELIVERY, COMPLETED
   totalPrice    Float
+  paymentMethod String      @default("CASH") // CASH, CARD, WALLET
   createdAt     DateTime    @default(now())
   items         OrderItem[]
 }

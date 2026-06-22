@@ -419,6 +419,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                 <div><span className="text-gray-400 font-bold">معرف الطلب:</span> <span className="font-display font-black text-gray-800">{selectedOrder.id}</span></div>
                 <div><span className="text-gray-400 font-bold">العميل:</span> <span className="font-bold text-gray-800">{selectedOrder.customerName}</span></div>
                 <div><span className="text-gray-400 font-bold">الجوال:</span> <span className="font-bold text-gray-800">{selectedOrder.customerPhone}</span></div>
+                <div><span className="text-gray-400 font-bold">طريقة الدفع:</span> <span className="font-bold text-blue-600">{selectedOrder.paymentMethod || 'CASH'}</span></div>
                 <div><span className="text-gray-400 font-bold">نوع الاستلام:</span> <span className="font-bold text-red-600">{selectedOrder.deliveryType === 'DELIVERY' ? '🚀 توصيل' : '🏪 استلام'}</span></div>
                 <div><span className="text-gray-400 font-bold">العنوان:</span> <p className="font-bold text-gray-700 text-xs mt-1 bg-gray-50 p-2.5 rounded-lg leading-relaxed">{selectedOrder.address}</p></div>
               </div>
