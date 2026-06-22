@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config';
 import { CheckCircle2, Clock, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
 
 interface OrderTrackerProps {
@@ -12,11 +13,19 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
 
   const fetchOrder = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/api/orders/${orderId}`);
+      const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
+      if (!res.ok) throw new Error('Not found on server');
       const data = await res.json();
       setOrder(data);
     } catch (err) {
-      console.error('Failed to load tracking order:', err);
+      console.warn('Backend offline or order not found on server, searching locally:', err);
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const found = localOrders.find((o: any) => o.id === orderId);
+      if (found) {
+        setOrder(found);
+      } else {
+        console.error('Order not found locally either.');
+      }
     } finally {
       setLoading(false);
     }
@@ -24,14 +33,19 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
 
   const advanceStatus = async (nextStatus: string) => {
     try {
-      await fetch(`http://localhost:3001/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: nextStatus })
       });
+      if (!res.ok) throw new Error('Failed to update on server');
       fetchOrder();
     } catch (err) {
-      console.error('Error updating status:', err);
+      console.warn('Backend offline, updating order status locally:', err);
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const updated = localOrders.map((o: any) => o.id === orderId ? { ...o, status: nextStatus } : o);
+      localStorage.setItem('local_orders', JSON.stringify(updated));
+      setOrder((prev: any) => prev ? { ...prev, status: nextStatus } : null);
     }
   };
 

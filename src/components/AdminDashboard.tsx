@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config';
 import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -74,12 +75,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/orders');
+      const res = await fetch(`${API_BASE_URL}/api/orders`);
       const data = await res.json();
       setOrders(data);
     } catch (err) {
-      console.warn('Backend server offline, using local admin mockup data:', err);
-      setOrders(MOCK_ORDERS);
+      console.warn('Backend server offline, loading local localStorage orders:', err);
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      setOrders(localOrders.length > 0 ? localOrders : MOCK_ORDERS);
     } finally {
       setLoading(false);
     }
@@ -98,7 +100,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     e.preventDefault();
     setLoginError('');
     try {
-      const res = await fetch('http://localhost:3001/api/admin/login', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ passcode })
@@ -140,7 +142,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/admin/change-password', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPasscode: currentPass, newPasscode: newPass })
@@ -186,7 +188,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      await fetch(`http://localhost:3001/api/orders/${orderId}/status`, {
+      await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -196,7 +198,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
         setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
       }
     } catch (err) {
-      console.error('Failed to update status on server:', err);
+      console.warn('Failed to update status on server, updating locally:', err);
+      
+      const localOrders = JSON.parse(localStorage.getItem('local_orders') || '[]');
+      const updated = localOrders.map((o: any) => o.id === orderId ? { ...o, status: newStatus } : o);
+      localStorage.setItem('local_orders', JSON.stringify(updated));
+      
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../config';
 import type { Category, MenuItem } from '../types';
 
 const FALLBACK_CATEGORIES: Category[] = [
@@ -117,8 +118,8 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const catsRes = await fetch('http://localhost:3001/api/categories');
-        const menuRes = await fetch('http://localhost:3001/api/menu');
+        const catsRes = await fetch(`${API_BASE_URL}/api/categories`);
+        const menuRes = await fetch(`${API_BASE_URL}/api/menu`);
         const catsData = await catsRes.json();
         const menuData = await menuRes.json();
 
