@@ -161,7 +161,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                     <span className="text-[10px] text-red-600 font-bold block mt-1">{item.customizations.map(c => c.name).join(', ')}</span>
                   )}
                 </div>
-                <span className="font-bold text-gray-900">{item.price * item.quantity} ر.س</span>
+                <span className="font-bold text-gray-900">{item.price * item.quantity} ريال يمني</span>
               </div>
             ))}
           </div>
@@ -169,15 +169,15 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
           <div className="space-y-3 pt-4 border-t border-gray-100 text-sm">
             <div className="flex justify-between text-gray-600">
               <span>المجموع الفرعي لطلبك:</span>
-              <span>{subTotal} ر.س</span>
+              <span>{subTotal} ريال يمني</span>
             </div>
             <div className="flex justify-between text-gray-600">
               <span>رسوم التوصيل:</span>
-              <span>{deliveryFee} ر.س</span>
+              <span>{deliveryFee} ريال يمني</span>
             </div>
             <div className="flex justify-between font-bold text-gray-900 text-lg pt-2 border-t border-gray-200">
               <span>المجموع الكلي:</span>
-              <span className="text-red-600">{grandTotal} ر.س</span>
+              <span className="text-red-600">{grandTotal} ريال يمني</span>
             </div>
           </div>
         </div>

@@ -63,7 +63,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, o
                       )}
                     </div>
                     <div className="flex justify-between items-center mt-3">
-                      <span className="font-bold text-red-600 text-sm">{item.price * item.quantity} ر.س</span>
+                      <span className="font-bold text-red-600 text-sm">{item.price * item.quantity} ريال يمني</span>
                       
                       {/* Increment/Decrement controls */}
                       <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-full shadow-inner">
@@ -87,7 +87,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, cart, o
             <div className="p-6 border-t border-gray-100 bg-gray-50/70 space-y-4">
               <div className="flex justify-between items-center font-bold text-gray-900">
                 <span>المجموع الفرعي للطلب:</span>
-                <span className="text-2xl text-red-600">{total} ر.س</span>
+                <span className="text-2xl text-red-600">{total} ريال يمني</span>
               </div>
               <button 
                 onClick={onCheckout}

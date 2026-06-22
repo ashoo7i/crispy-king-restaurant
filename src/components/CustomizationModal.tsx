@@ -67,7 +67,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
         <div className="p-6">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-2xl font-bold text-gray-900">{item.name}</h3>
-            <span className="text-lg font-bold text-red-600">{item.price} ر.س</span>
+            <span className="text-lg font-bold text-red-600">{item.price} ريال يمني</span>
           </div>
           <p className="text-gray-500 text-sm mb-6 leading-relaxed">{item.description}</p>
 
@@ -90,7 +90,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
                       }`}
                     >
                       <div className="text-sm">{option.name}</div>
-                      {option.price > 0 && <div className="text-xs mt-1 text-gray-500">+{option.price} ر.س</div>}
+                      {option.price > 0 && <div className="text-xs mt-1 text-gray-500">+{option.price} ريال يمني</div>}
                     </button>
                   ))}
                 </div>
@@ -116,7 +116,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
                         <input type="checkbox" checked={isOptionSelected(option)} onChange={() => {}} className="accent-red-600 w-4 h-4 rounded" />
                         <span className="font-medium text-gray-700 text-sm">{option.name}</span>
                       </div>
-                      <span className="text-sm font-semibold text-red-600">+{option.price} ر.س</span>
+                      <span className="text-sm font-semibold text-red-600">+{option.price} ريال يمني</span>
                     </label>
                   ))}
                 </div>
@@ -140,7 +140,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
               type="button"
               className="w-full sm:w-auto bg-red-600 text-white font-bold px-8 py-3 rounded-full hover:bg-red-700 shadow-md hover:shadow-lg transition-all"
             >
-              إضافة للطلب - {totalPrice} ر.س
+              إضافة للطلب - {totalPrice} ريال يمني
             </button>
           </div>
         </div>
