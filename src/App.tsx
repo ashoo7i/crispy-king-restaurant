@@ -75,7 +75,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col font-sans">
       <Navbar 
         cartCount={cartCount} 
         onCartToggle={() => setIsCartOpen(!isCartOpen)} 
@@ -93,8 +93,8 @@ function App() {
             </div>
             
             <div className="mt-16 text-center">
-              <h2 className="text-3xl font-display font-black text-gray-900">لماذا كرسبي كينج؟</h2>
-              <p className="mt-4 text-gray-600 max-w-xl mx-auto">نصنع كل وجبة بشغف وعناية فائقة، باستخدام أجود صدور الدجاج الطازجة والمقرمشة يومياً!</p>
+              <h2 className="text-3xl font-display font-black text-white">لماذا كرسبي كينج؟</h2>
+              <p className="mt-4 text-gray-300 max-w-xl mx-auto">نصنع كل وجبة بشغف وعناية فائقة، باستخدام أجود صدور الدجاج الطازجة والمقرمشة يومياً!</p>
               <button 
                 onClick={() => onNavigate('menu')} 
                 className="mt-6 bg-red-600 text-white font-bold px-8 py-3.5 rounded-full hover:bg-red-700 shadow-md hover:shadow-lg transition-all"

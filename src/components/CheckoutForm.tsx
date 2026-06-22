@@ -134,11 +134,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-        <h2 className="text-3xl font-black text-gray-900">تفاصيل الدفع وإتمام الطلب</h2>
+        <h2 className="text-3xl font-black text-white">تفاصيل الدفع وإتمام الطلب</h2>
         <button 
           type="button" 
           onClick={onBackToMenu}
-          className="text-red-600 font-bold hover:underline text-sm flex items-center gap-1"
+          className="text-red-500 font-bold hover:underline text-sm flex items-center gap-1"
         >
           ← العودة لتعديل الطلبات
         </button>
@@ -146,17 +146,17 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Delivery Details Form */}
-        <form onSubmit={handleSubmit} className="lg:col-span-7 bg-white p-8 rounded-3xl shadow-xs border border-gray-100/80 space-y-6">
+        <form onSubmit={handleSubmit} className="lg:col-span-7 bg-gray-900 p-8 rounded-3xl shadow-xs border border-gray-800 space-y-6 text-white">
           <div>
-            <label className="block text-sm font-bold text-gray-800 mb-3">نوع الاستلام</label>
+            <label className="block text-sm font-bold text-gray-200 mb-3">نوع الاستلام</label>
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
                 onClick={() => setDeliveryType('DELIVERY')}
                 className={`py-3.5 rounded-2xl font-bold transition-all border-2 text-sm ${
                   deliveryType === 'DELIVERY'
-                    ? 'border-red-600 bg-red-50/50 text-red-600 shadow-xs'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    ? 'border-red-600 bg-red-950/20 text-red-500 shadow-xs'
+                    : 'border-gray-850 hover:border-gray-700 text-gray-300'
                 }`}
               >
                 🚀 توصيل للعنوان
@@ -166,8 +166,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                 onClick={() => setDeliveryType('PICKUP')}
                 className={`py-3.5 rounded-2xl font-bold transition-all border-2 text-sm ${
                   deliveryType === 'PICKUP'
-                    ? 'border-red-600 bg-red-50/50 text-red-600 shadow-xs'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    ? 'border-red-600 bg-red-950/20 text-red-500 shadow-xs'
+                    : 'border-gray-850 hover:border-gray-700 text-gray-300'
                 }`}
               >
                 🏪 استلام من الفرع
@@ -176,55 +176,55 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">اسم المستلم</label>
+            <label className="block text-sm font-bold text-gray-300 mb-2">اسم المستلم</label>
             <input
               type="text"
               required
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="الاسم بالكامل"
-              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-660 transition-all text-sm"
+              className="w-full px-4 py-3.5 rounded-xl border border-gray-800 bg-gray-950 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">رقم الجوال</label>
+            <label className="block text-sm font-bold text-gray-300 mb-2">رقم الجوال</label>
             <input
               type="tel"
               required
               value={phone}
               onChange={e => setPhone(e.target.value)}
               placeholder="77xxxxxxx"
-              className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-sm text-right"
+              className="w-full px-4 py-3.5 rounded-xl border border-gray-800 bg-gray-950 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm text-right font-display"
               dir="ltr"
             />
           </div>
 
           {deliveryType === 'DELIVERY' && (
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">عنوان التوصيل بالتفصيل</label>
+              <label className="block text-sm font-bold text-gray-300 mb-2">عنوان التوصيل بالتفصيل</label>
               <textarea
                 required
                 value={address}
                 onChange={e => setAddress(e.target.value)}
                 placeholder="الحي، اسم الشارع، رقم المنزل، تفاصيل المعالم القريبة"
                 rows={3}
-                className="w-full px-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-sm"
+                className="w-full px-4 py-3.5 rounded-xl border border-gray-800 bg-gray-950 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm"
               />
             </div>
           )}
 
           {/* Payment Method Selector Section */}
-          <div className="border-t border-gray-100 pt-6 space-y-4">
-            <label className="block text-sm font-bold text-gray-800 mb-1">طريقة الدفع</label>
+          <div className="border-t border-gray-800 pt-6 space-y-4">
+            <label className="block text-sm font-bold text-gray-200 mb-1">طريقة الدفع</label>
             <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('CASH')}
                 className={`py-3 rounded-2xl font-bold transition-all border-2 text-xs flex flex-col items-center justify-center gap-1.5 ${
                   paymentMethod === 'CASH'
-                    ? 'border-red-600 bg-red-50/50 text-red-600'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    ? 'border-red-600 bg-red-950/20 text-red-500'
+                    : 'border-gray-850 hover:border-gray-700 text-gray-300'
                 }`}
               >
                 <span className="text-lg">💵</span>
@@ -235,8 +235,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                 onClick={() => setPaymentMethod('CARD')}
                 className={`py-3 rounded-2xl font-bold transition-all border-2 text-xs flex flex-col items-center justify-center gap-1.5 ${
                   paymentMethod === 'CARD'
-                    ? 'border-red-600 bg-red-50/50 text-red-600'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    ? 'border-red-600 bg-red-950/20 text-red-500'
+                    : 'border-gray-850 hover:border-gray-700 text-gray-300'
                 }`}
               >
                 <span className="text-lg">💳</span>
@@ -247,8 +247,8 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                 onClick={() => setPaymentMethod('WALLET')}
                 className={`py-3 rounded-2xl font-bold transition-all border-2 text-xs flex flex-col items-center justify-center gap-1.5 ${
                   paymentMethod === 'WALLET'
-                    ? 'border-red-600 bg-red-50/50 text-red-600'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                    ? 'border-red-600 bg-red-950/20 text-red-500'
+                    : 'border-gray-850 hover:border-gray-700 text-gray-300'
                 }`}
               >
                 <span className="text-lg">📱</span>
@@ -258,15 +258,15 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
 
             {/* Cash instructions */}
             {paymentMethod === 'CASH' && (
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-xs text-gray-500 font-bold text-center leading-relaxed">
+              <div className="bg-gray-950 p-4 rounded-2xl border border-gray-800 text-xs text-gray-400 font-bold text-center leading-relaxed">
                 سيتم سداد المبلغ بالكامل نقدًا عند استلام الوجبة من مندوب التوصيل أو الفرع بالهناء والشفاء.
               </div>
             )}
 
             {/* Credit Card Mock Form */}
             {paymentMethod === 'CARD' && (
-              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-3">
-                <p className="text-[10px] text-amber-700 bg-amber-50 border border-amber-100/50 p-2.5 rounded-xl text-center font-bold">
+              <div className="bg-gray-950 p-5 rounded-2xl border border-gray-800 space-y-3">
+                <p className="text-[10px] text-amber-500 bg-amber-950/40 border border-amber-900/50 p-2.5 rounded-xl text-center font-bold">
                   ⚠️ وضع الدفع التجريبي نشط: الرجاء إدخال أي أرقام وهمية لتأكيد العملية.
                 </p>
                 <div>
@@ -277,7 +277,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                     placeholder="رقم البطاقة (16 رقم)"
                     value={cardNumber}
                     onChange={e => setCardNumber(e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim())}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-center font-display"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs text-center font-display"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -287,7 +287,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                     placeholder="تاريخ الانتهاء MM/YY"
                     value={cardExpiry}
                     onChange={e => setCardExpiry(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-center font-display"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs text-center font-display"
                   />
                   <input
                     type="password"
@@ -296,7 +296,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                     placeholder="رمز التحقق CVV"
                     value={cardCvv}
                     onChange={e => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-center font-display"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs text-center font-display"
                   />
                 </div>
               </div>
@@ -304,13 +304,13 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
 
             {/* Electronic Wallet Mock Form */}
             {paymentMethod === 'WALLET' && (
-              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-3">
+              <div className="bg-gray-950 p-5 rounded-2xl border border-gray-800 space-y-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-gray-400 mb-1.5">اختر المحفظة اليمنيّة</label>
+                  <label className="block text-[10px] font-bold text-gray-500 mb-1.5">اختر المحفظة اليمنيّة</label>
                   <select
                     value={walletType}
                     onChange={e => setWalletType(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs font-bold text-gray-700"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-800 bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-bold text-gray-300"
                   >
                     <option value="جوال الكريمي">جوال الكريمي (Kuraimi)</option>
                     <option value="محفظة حاسب">حاسب (Haseb)</option>
@@ -326,7 +326,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
                     placeholder="رقم الهاتف أو الحساب المرتبط بالمحفظة"
                     value={walletAccount}
                     onChange={e => setWalletAccount(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-red-600 text-xs text-right font-display"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-800 bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs text-right font-display"
                   />
                 </div>
               </div>
@@ -336,42 +336,42 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ cart, onOrderSuccess
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-red-600 text-white font-bold py-4 rounded-2xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg disabled:bg-gray-400 text-sm tracking-wide disabled:cursor-not-allowed"
+            className="w-full bg-red-600 text-white font-bold py-4 rounded-2xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg disabled:bg-gray-800 disabled:text-gray-500 text-sm tracking-wide disabled:cursor-not-allowed"
           >
             {submitting ? 'جاري إرسال طلبك للتحضير...' : 'تأكيد الطلب وإرساله للمطبخ'}
           </button>
         </form>
 
         {/* Bill Calculations Card */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-3xl shadow-xs border border-gray-100/80 flex flex-col justify-between h-fit">
-          <h3 className="font-bold text-gray-900 text-lg mb-6 border-b border-gray-100 pb-3">ملخص الحساب</h3>
+        <div className="lg:col-span-5 bg-gray-900 p-6 rounded-3xl shadow-xs border border-gray-800 flex flex-col justify-between h-fit text-white">
+          <h3 className="font-bold text-white text-lg mb-6 border-b border-gray-800 pb-3">ملخص الحساب</h3>
           
           <div className="space-y-4 max-h-[300px] overflow-y-auto mb-6 pr-2 scrollbar-thin">
             {cart.map(item => (
-              <div key={item.id} className="flex justify-between items-center text-sm border-b border-gray-50 pb-3">
+              <div key={item.id} className="flex justify-between items-center text-sm border-b border-gray-800/60 pb-3">
                 <div className="flex-1 pl-4">
-                  <div className="font-bold text-gray-900">{item.name} <span className="text-gray-400 font-normal">x{item.quantity}</span></div>
+                  <div className="font-bold text-white">{item.name} <span className="text-gray-500 font-normal">x{item.quantity}</span></div>
                   {item.customizations.length > 0 && (
-                    <span className="text-[10px] text-red-600 font-bold block mt-1">{item.customizations.map(c => c.name).join(', ')}</span>
+                    <span className="text-[10px] text-red-500 font-bold block mt-1">{item.customizations.map(c => c.name).join(', ')}</span>
                   )}
                 </div>
-                <span className="font-bold text-gray-900">{item.price * item.quantity} ريال يمني</span>
+                <span className="font-bold text-white">{item.price * item.quantity} ريال يمني</span>
               </div>
             ))}
           </div>
 
-          <div className="space-y-3 pt-4 border-t border-gray-100 text-sm">
-            <div className="flex justify-between text-gray-600">
+          <div className="space-y-3 pt-4 border-t border-gray-800 text-sm">
+            <div className="flex justify-between text-gray-400">
               <span>المجموع الفرعي لطلبك:</span>
               <span>{subTotal} ريال يمني</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between text-gray-400">
               <span>رسوم التوصيل:</span>
               <span>{deliveryFee} ريال يمني</span>
             </div>
-            <div className="flex justify-between font-bold text-gray-900 text-lg pt-2 border-t border-gray-200">
+            <div className="flex justify-between font-bold text-white text-lg pt-2 border-t border-gray-800">
               <span>المجموع الكلي:</span>
-              <span className="text-red-600">{grandTotal} ريال يمني</span>
+              <span className="text-red-500">{grandTotal} ريال يمني</span>
             </div>
           </div>
         </div>

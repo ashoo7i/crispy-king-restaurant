@@ -215,12 +215,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
   if (!isAuthenticated) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-        <div className={`w-full max-w-md bg-white p-8 rounded-3xl border border-gray-100 shadow-xl text-center space-y-6 ${shake ? 'animate-bounce' : ''}`}>
-          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto border-2 border-red-100 animate-pulse">
+        <div className={`w-full max-w-md bg-gray-900 p-8 rounded-3xl border border-gray-800 shadow-xl text-center space-y-6 text-white ${shake ? 'animate-bounce' : ''}`}>
+          <div className="w-16 h-16 bg-red-950/20 text-red-500 rounded-full flex items-center justify-center mx-auto border-2 border-red-900/40 animate-pulse">
             <Lock className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-gray-900">شاشة التحقق والأمان 🔐</h2>
+            <h2 className="text-2xl font-black text-white">شاشة التحقق والأمان 🔐</h2>
             <p className="text-xs text-gray-400 font-bold mt-1.5">الوصول إلى لوحة إدارة الطلبات محمي بكلمة مرور</p>
           </div>
 
@@ -231,13 +231,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                 placeholder="أدخل كلمة المرور (الافتراضية: admin123)"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                className="w-full text-center px-4 py-3 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-sm bg-gray-50"
+                className="w-full text-center px-4 py-3 rounded-2xl border border-gray-850 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-sm"
                 required
               />
             </div>
 
             {loginError && (
-              <div className="text-xs text-red-600 bg-red-50 py-2.5 px-4 rounded-xl font-bold flex items-center justify-center gap-1.5 border border-red-200">
+              <div className="text-xs text-red-500 bg-red-950/20 py-2.5 px-4 rounded-xl font-bold flex items-center justify-center gap-1.5 border border-red-900/50">
                 <ShieldAlert className="w-3.5 h-3.5" /> {loginError}
               </div>
             )}
@@ -246,13 +246,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
               <button 
                 type="button"
                 onClick={onBackToMenu}
-                className="w-1/2 border border-gray-200 text-gray-600 py-3 rounded-2xl hover:bg-gray-50 font-bold text-xs transition-colors"
+                className="w-1/2 border border-gray-800 text-gray-400 py-3 rounded-2xl hover:bg-gray-800 font-bold text-xs transition-colors bg-gray-950"
               >
                 العودة للمنيو
               </button>
               <button 
                 type="submit"
-                className="w-1/2 bg-red-600 text-white py-3 rounded-2xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-200"
+                className="w-1/2 bg-red-600 text-white py-3 rounded-2xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-950"
               >
                 تأكيد الدخول
               </button>
@@ -276,30 +276,30 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
   const completedOrdersCount = orders.filter(o => o.status === 'COMPLETED').length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 space-y-8 animate-in fade-in duration-300 text-white">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pb-6 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pb-6 border-b border-gray-800">
         <div>
-          <h2 className="text-3xl font-black text-gray-900">لوحة تحكم كرسبي كينج 👑</h2>
-          <p className="text-sm text-gray-500 mt-1">إدارة ومراقبة الطلبات الحية وتحديث حالة التسليم للعملاء</p>
+          <h2 className="text-3xl font-black text-white">لوحة تحكم كرسبي كينج 👑</h2>
+          <p className="text-sm text-gray-400 mt-1">إدارة ومراقبة الطلبات الحية وتحديث حالة التسليم للعملاء</p>
         </div>
         <div className="flex flex-wrap gap-2.5">
           <button 
             onClick={fetchOrders} 
-            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-bold text-xs bg-white shadow-xs transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-800 hover:border-gray-700 text-gray-300 rounded-full font-bold text-xs bg-gray-900 shadow-xs transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" /> تحديث البيانات
           </button>
           <button 
             onClick={() => setIsChangeModalOpen(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-bold text-xs bg-white shadow-xs transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2.5 border border-gray-880 hover:border-gray-700 text-gray-300 rounded-full font-bold text-xs bg-gray-900 shadow-xs transition-colors"
           >
             <KeyRound className="w-3.5 h-3.5" /> تغيير رمز المرور
           </button>
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full font-bold text-xs transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-950 hover:bg-gray-850 text-gray-300 rounded-full font-bold text-xs transition-colors border border-gray-800"
           >
             <LogOut className="w-3.5 h-3.5" /> خروج
           </button>
@@ -314,32 +314,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
 
       {/* Stats Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xs flex items-center gap-5">
-          <div className="w-12 h-12 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center">
+        <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xs flex items-center gap-5 text-white">
+          <div className="w-12 h-12 bg-red-950/20 text-red-500 rounded-2xl flex items-center justify-center">
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">{totalRevenue} ريال</div>
+            <div className="text-2xl font-black text-white">{totalRevenue} ريال</div>
             <div className="text-xs text-gray-400 font-bold mt-1">إجمالي المبيعات المكتملة</div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xs flex items-center gap-5">
-          <div className="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center">
+        <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xs flex items-center gap-5 text-white">
+          <div className="w-12 h-12 bg-yellow-950/20 text-yellow-500 rounded-2xl flex items-center justify-center">
             <Clock className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">{activeOrdersCount} طلبات</div>
+            <div className="text-2xl font-black text-white">{activeOrdersCount} طلبات</div>
             <div className="text-xs text-gray-400 font-bold mt-1">الطلبات النشطة حالياً</div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xs flex items-center gap-5">
-          <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center">
+        <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xs flex items-center gap-5 text-white">
+          <div className="w-12 h-12 bg-green-950/20 text-green-500 rounded-2xl flex items-center justify-center">
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-gray-900">{completedOrdersCount} طلبات</div>
+            <div className="text-2xl font-black text-white">{completedOrdersCount} طلبات</div>
             <div className="text-xs text-gray-400 font-bold mt-1">الطلبات المسلمة بالكامل</div>
           </div>
         </div>
@@ -347,12 +347,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
 
       {/* Orders details grid splitting layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-100 shadow-xs overflow-hidden">
-          <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-            <h3 className="font-bold text-gray-900 text-lg">الطلبات الواردة ({orders.length})</h3>
+        <div className="lg:col-span-8 bg-gray-900 rounded-3xl border border-gray-800 shadow-xs overflow-hidden text-white">
+          <div className="p-6 border-b border-gray-800 bg-gray-950/50">
+            <h3 className="font-bold text-white text-lg">الطلبات الواردة ({orders.length})</h3>
           </div>
 
-          <div className="divide-y divide-gray-100 max-h-[500px] overflow-y-auto pr-1">
+          <div className="divide-y divide-gray-800 max-h-[500px] overflow-y-auto pr-1">
             {orders.length === 0 ? (
               <p className="text-center py-12 text-gray-400 font-bold">لا يوجد أي طلبات واردة بعد</p>
             ) : (
@@ -364,23 +364,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                   COMPLETED: 'تم التوصيل'
                 };
                 const statusColors: Record<string, string> = {
-                  PENDING: 'bg-yellow-50 text-yellow-600 border-yellow-200',
-                  PREPARING: 'bg-orange-50 text-orange-600 border-orange-200',
-                  OUT_FOR_DELIVERY: 'bg-blue-50 text-blue-600 border-blue-200',
-                  COMPLETED: 'bg-green-50 text-green-600 border-green-200'
+                  PENDING: 'bg-yellow-950/40 text-yellow-500 border-yellow-900/50',
+                  PREPARING: 'bg-orange-950/40 text-orange-500 border-orange-900/50',
+                  OUT_FOR_DELIVERY: 'bg-blue-950/40 text-blue-500 border-blue-900/50',
+                  COMPLETED: 'bg-green-950/40 text-green-500 border-green-900/50'
                 };
 
                 return (
                   <div 
                     key={order.id} 
                     onClick={() => setSelectedOrder(order)}
-                    className={`p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-red-50/10 transition-colors ${
-                      selectedOrder?.id === order.id ? 'bg-red-50/20' : ''
+                    className={`p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-red-955/10 transition-colors ${
+                      selectedOrder?.id === order.id ? 'bg-red-950/20' : ''
                     }`}
                   >
                     <div>
                       <div className="flex items-center gap-3">
-                        <span className="font-display font-black text-gray-900 text-base">{order.id}</span>
+                        <span className="font-display font-black text-white text-base">{order.id}</span>
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${statusColors[order.status] || ''}`}>
                           {statusLabels[order.status] || order.status}
                         </span>
@@ -388,18 +388,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                       <div className="text-xs text-gray-400 font-bold mt-2">
                         العميل: {order.customerName} - {order.customerPhone}
                       </div>
-                      <div className="text-[11px] text-gray-500 mt-1 max-w-sm truncate">
+                      <div className="text-[11px] text-gray-400 mt-1 max-w-sm truncate">
                         العنوان: {order.address}
                       </div>
                     </div>
                     <div className="flex items-center gap-4 sm:text-left self-end sm:self-auto">
                       <div className="text-right sm:text-left">
-                        <div className="font-black text-red-600">{order.totalPrice} ريال</div>
+                        <div className="font-black text-red-500">{order.totalPrice} ريال</div>
                         <div className="text-[10px] text-gray-400 mt-1">
                           {new Date(order.createdAt).toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
-                      <button className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-gray-100 transition-colors">
+                      <button className="p-2 text-gray-400 hover:text-red-500 rounded-full hover:bg-gray-950 transition-colors">
                         <Eye className="w-4 h-4" />
                       </button>
                     </div>
@@ -411,42 +411,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
         </div>
 
         {/* Selected Order Details */}
-        <div className="lg:col-span-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-xs h-fit space-y-6">
-          <h3 className="font-bold text-gray-900 text-lg border-b border-gray-100 pb-3 mb-4">تفاصيل الطلب المحدد</h3>
+        <div className="lg:col-span-4 bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xs h-fit space-y-6 text-white">
+          <h3 className="font-bold text-white text-lg border-b border-gray-800 pb-3 mb-4">تفاصيل الطلب المحدد</h3>
           {selectedOrder ? (
             <div className="space-y-6 animate-in fade-in duration-200">
               <div className="text-sm space-y-2.5">
-                <div><span className="text-gray-400 font-bold">معرف الطلب:</span> <span className="font-display font-black text-gray-800">{selectedOrder.id}</span></div>
-                <div><span className="text-gray-400 font-bold">العميل:</span> <span className="font-bold text-gray-800">{selectedOrder.customerName}</span></div>
-                <div><span className="text-gray-400 font-bold">الجوال:</span> <span className="font-bold text-gray-800">{selectedOrder.customerPhone}</span></div>
-                <div><span className="text-gray-400 font-bold">طريقة الدفع:</span> <span className="font-bold text-blue-600">{selectedOrder.paymentMethod || 'CASH'}</span></div>
-                <div><span className="text-gray-400 font-bold">نوع الاستلام:</span> <span className="font-bold text-red-600">{selectedOrder.deliveryType === 'DELIVERY' ? '🚀 توصيل' : '🏪 استلام'}</span></div>
-                <div><span className="text-gray-400 font-bold">العنوان:</span> <p className="font-bold text-gray-700 text-xs mt-1 bg-gray-50 p-2.5 rounded-lg leading-relaxed">{selectedOrder.address}</p></div>
+                <div><span className="text-gray-400 font-bold">معرف الطلب:</span> <span className="font-display font-black text-white">{selectedOrder.id}</span></div>
+                <div><span className="text-gray-400 font-bold">العميل:</span> <span className="font-bold text-white">{selectedOrder.customerName}</span></div>
+                <div><span className="text-gray-400 font-bold">الجوال:</span> <span className="font-bold text-white">{selectedOrder.customerPhone}</span></div>
+                <div><span className="text-gray-400 font-bold">طريقة الدفع:</span> <span className="font-bold text-blue-400">{selectedOrder.paymentMethod || 'CASH'}</span></div>
+                <div><span className="text-gray-400 font-bold">نوع الاستلام:</span> <span className="font-bold text-red-500">{selectedOrder.deliveryType === 'DELIVERY' ? '🚀 توصيل' : '🏪 استلام'}</span></div>
+                <div><span className="text-gray-400 font-bold">العنوان:</span> <p className="font-bold text-gray-300 text-xs mt-1 bg-gray-950 p-2.5 rounded-lg leading-relaxed border border-gray-850">{selectedOrder.address}</p></div>
               </div>
 
-              <div className="border-t border-gray-100 pt-4 space-y-3">
+              <div className="border-t border-gray-800 pt-4 space-y-3">
                 <span className="text-xs text-gray-400 font-black block">الوجبات المطلوبة:</span>
                 {selectedOrder.items.map((item: any) => {
                   const customizations = JSON.parse(item.customizations || '[]');
                   return (
-                    <div key={item.id} className="text-xs flex justify-between items-start border-b border-gray-50 pb-2.5">
+                    <div key={item.id} className="text-xs flex justify-between items-start border-b border-gray-800/60 pb-2.5">
                       <div>
-                        <div className="font-bold text-gray-900">{item.menuItem.name} <span className="text-red-500 font-normal">x{item.quantity}</span></div>
+                        <div className="font-bold text-white">{item.menuItem.name} <span className="text-red-500 font-normal">x{item.quantity}</span></div>
                         {customizations.length > 0 && (
                           <div className="text-[10px] text-gray-400 mt-1 flex flex-wrap gap-1">
                             {customizations.map((c: any, i: number) => (
-                              <span key={i} className="bg-gray-100 px-1.5 py-0.5 rounded-md font-bold">{c.name}</span>
+                              <span key={i} className="bg-gray-950 px-1.5 py-0.5 rounded-md font-bold text-gray-300 border border-gray-850">{c.name}</span>
                             ))}
                           </div>
                         )}
                       </div>
-                      <span className="font-bold text-gray-800">{item.price * item.quantity} ريال</span>
+                      <span className="font-bold text-gray-200">{item.price * item.quantity} ريال</span>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="border-t border-gray-100 pt-4 space-y-3">
+              <div className="border-t border-gray-800 pt-4 space-y-3">
                 <span className="text-xs text-gray-400 font-black block">تغيير حالة الطلب الحية:</span>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {['PENDING', 'PREPARING', 'OUT_FOR_DELIVERY', 'COMPLETED'].map((status) => {
@@ -459,7 +459,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                         className={`p-2.5 rounded-xl border font-bold transition-all ${
                           selectedOrder.status === status 
                             ? activeColors[status] 
-                            : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                            : 'border-gray-800 hover:border-gray-700 text-gray-300 bg-gray-955'
                         }`}
                       >
                         {labels[status]}
@@ -477,9 +477,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
 
       {/* Change Password Modal */}
       {isChangeModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md p-8 rounded-3xl border border-gray-100 shadow-2xl space-y-5 text-right" dir="rtl">
-            <h3 className="text-xl font-black text-gray-900 border-b border-gray-100 pb-3">تغيير رمز مرور الإدارة 🔑</h3>
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-gray-900 w-full max-w-md p-8 rounded-3xl border border-gray-800 shadow-2xl space-y-5 text-right text-white" dir="rtl">
+            <h3 className="text-xl font-black text-white border-b border-gray-800 pb-3">تغيير رمز مرور الإدارة 🔑</h3>
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-gray-400 block mb-1.5">رمز المرور الحالي</label>
@@ -487,7 +487,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                   type="password"
                   value={currentPass}
                   onChange={(e) => setCurrentPass(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   required
                 />
               </div>
@@ -497,7 +497,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                   type="password"
                   value={newPass}
                   onChange={(e) => setNewPass(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   required
                 />
               </div>
@@ -507,13 +507,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                   type="password"
                   value={confirmPass}
                   onChange={(e) => setConfirmPass(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
                   required
                 />
               </div>
 
-              {modalError && <p className="text-xs text-red-600 bg-red-50 p-2.5 rounded-xl border border-red-200 font-bold">{modalError}</p>}
-              {modalSuccess && <p className="text-xs text-green-600 bg-green-50 p-2.5 rounded-xl border border-green-200 font-bold">{modalSuccess}</p>}
+              {modalError && <p className="text-xs text-red-500 bg-red-955/20 p-2.5 rounded-xl border border-red-900/50 font-bold">{modalError}</p>}
+              {modalSuccess && <p className="text-xs text-green-500 bg-green-955/20 p-2.5 rounded-xl border border-green-900/50 font-bold">{modalSuccess}</p>}
 
               <div className="flex gap-3 pt-2">
                 <button 
@@ -523,13 +523,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                     setModalError('');
                     setModalSuccess('');
                   }}
-                  className="w-1/2 border border-gray-200 text-gray-600 py-2.5 rounded-xl hover:bg-gray-50 font-bold text-xs transition-colors"
+                  className="w-1/2 border border-gray-850 text-gray-300 py-2.5 rounded-xl hover:bg-gray-850 font-bold text-xs transition-colors bg-gray-955"
                 >
                   إلغاء
                 </button>
                 <button 
                   type="submit"
-                  className="w-1/2 bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-200"
+                  className="w-1/2 bg-red-600 text-white py-2.5 rounded-xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-950"
                 >
                   حفظ التغييرات
                   </button>

@@ -53,30 +53,30 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-gray-900 text-white border border-gray-800 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
         
         {/* Banner Food Image */}
-        <div className="relative h-60 bg-gray-100">
+        <div className="relative h-60 bg-gray-950">
           <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-          <button onClick={onClose} className="absolute top-4 right-4 bg-white/95 p-2 rounded-full text-gray-800 hover:bg-red-50 hover:text-red-600 transition-colors">
+          <button onClick={onClose} className="absolute top-4 right-4 bg-gray-950/95 p-2 rounded-full text-gray-200 hover:bg-gray-800 hover:text-red-500 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-6">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="text-2xl font-bold text-gray-900">{item.name}</h3>
-            <span className="text-lg font-bold text-red-600">{item.price} ريال يمني</span>
+            <h3 className="text-2xl font-bold text-white">{item.name}</h3>
+            <span className="text-lg font-bold text-red-500">{item.price} ريال يمني</span>
           </div>
-          <p className="text-gray-500 text-sm mb-6 leading-relaxed">{item.description}</p>
+          <p className="text-gray-400 text-sm mb-6 leading-relaxed">{item.description}</p>
 
           {/* Options Panels */}
           <div className="space-y-6 max-h-[300px] overflow-y-auto pr-2">
             {/* 1. Sizes selection */}
             {item.options.filter(opt => opt.category === 'SIZE').length > 0 && (
               <div>
-                <h4 className="font-bold text-gray-900 mb-3 border-r-4 border-red-600 pr-2">اختر الحجم:</h4>
+                <h4 className="font-bold text-white mb-3 border-r-4 border-red-600 pr-2">اختر الحجم:</h4>
                 <div className="grid grid-cols-2 gap-3">
                   {item.options.filter(opt => opt.category === 'SIZE').map(option => (
                     <button
@@ -85,12 +85,12 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
                       type="button"
                       className={`p-3.5 border-2 rounded-2xl text-right font-medium transition-all duration-200 ${
                         isOptionSelected(option)
-                          ? 'border-red-600 bg-red-50/30 text-red-600 font-bold'
-                          : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                          ? 'border-red-600 bg-red-950/20 text-red-500 font-bold'
+                          : 'border-gray-800 hover:border-gray-700 text-gray-300'
                       }`}
                     >
                       <div className="text-sm">{option.name}</div>
-                      {option.price > 0 && <div className="text-xs mt-1 text-gray-500">+{option.price} ريال يمني</div>}
+                      {option.price > 0 && <div className="text-xs mt-1 text-gray-400">+{option.price} ريال يمني</div>}
                     </button>
                   ))}
                 </div>
@@ -100,7 +100,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
             {/* 2. Addons checkboxes */}
             {item.options.filter(opt => opt.category === 'ADDON').length > 0 && (
               <div>
-                <h4 className="font-bold text-gray-900 mb-3 border-r-4 border-red-600 pr-2">إضافات مميزة:</h4>
+                <h4 className="font-bold text-white mb-3 border-r-4 border-red-600 pr-2">إضافات مميزة:</h4>
                 <div className="space-y-2">
                   {item.options.filter(opt => opt.category === 'ADDON').map(option => (
                     <label
@@ -108,15 +108,15 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
                       onClick={() => handleOptionToggle(option)}
                       className={`flex items-center justify-between p-3.5 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${
                         isOptionSelected(option)
-                          ? 'border-red-600 bg-red-50/30'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-red-600 bg-red-950/20'
+                          : 'border-gray-800 hover:border-gray-700'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={isOptionSelected(option)} onChange={() => {}} className="accent-red-600 w-4 h-4 rounded" />
-                        <span className="font-medium text-gray-700 text-sm">{option.name}</span>
+                        <span className="font-medium text-gray-300 text-sm">{option.name}</span>
                       </div>
-                      <span className="text-sm font-semibold text-red-600">+{option.price} ريال يمني</span>
+                      <span className="text-sm font-semibold text-red-500">+{option.price} ريال يمني</span>
                     </label>
                   ))}
                 </div>
@@ -125,13 +125,13 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({ item, on
           </div>
 
           {/* Modal bottom bar actions */}
-          <div className="border-t border-gray-100 pt-6 mt-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="flex items-center gap-4 bg-gray-100 px-4 py-2.5 rounded-full shadow-inner">
-              <button type="button" onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="p-1 text-gray-600 hover:text-red-600 transition-colors">
+          <div className="border-t border-gray-800 pt-6 mt-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="flex items-center gap-4 bg-gray-950 px-4 py-2.5 rounded-full border border-gray-850 shadow-inner">
+              <button type="button" onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="w-8 text-center font-bold text-gray-800">{quantity}</span>
-              <button type="button" onClick={() => setQuantity(prev => prev + 1)} className="p-1 text-gray-600 hover:text-red-600 transition-colors">
+              <span className="w-8 text-center font-bold text-gray-200">{quantity}</span>
+              <button type="button" onClick={() => setQuantity(prev => prev + 1)} className="p-1 text-gray-400 hover:text-red-500 transition-colors">
                 <Plus className="w-4 h-4" />
               </button>
             </div>

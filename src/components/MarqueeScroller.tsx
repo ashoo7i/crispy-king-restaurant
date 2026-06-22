@@ -54,7 +54,7 @@ export const MarqueeScroller = () => {
         {DOUBLE_FOOD_ITEMS.map((item, index) => (
           <div
             key={`${item.name}-${index}`}
-            className="group relative h-32 w-52 shrink-0 flex items-end justify-center rounded-3xl overflow-hidden shadow-lg border border-slate-100/50 hover:scale-105 transition-all duration-300"
+            className="group relative h-32 w-52 shrink-0 flex items-end justify-center rounded-3xl overflow-hidden shadow-lg border border-gray-800 hover:scale-105 transition-all duration-300"
           >
             {/* Background Image */}
             <img

@@ -86,21 +86,21 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 space-y-8 animate-in fade-in duration-300">
       {/* Tracker Banner */}
-      <div className="bg-white p-6 rounded-3xl shadow-xs border border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="bg-gray-900 p-6 rounded-3xl shadow-xs border border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-white">
         <div className="text-center sm:text-right">
-          <h2 className="text-2xl font-black text-gray-900">رقم تتبع طلبك: <span className="text-red-600 font-display">{order.id}</span></h2>
-          <p className="text-sm text-gray-500 mt-1">العميل: {order.customerName} - {order.customerPhone}</p>
+          <h2 className="text-2xl font-black text-white">رقم تتبع طلبك: <span className="text-red-500 font-display">{order.id}</span></h2>
+          <p className="text-sm text-gray-400 mt-1">العميل: {order.customerName} - {order.customerPhone}</p>
         </div>
         <button 
           onClick={fetchOrder} 
-          className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full font-bold text-xs bg-gray-50 hover:bg-gray-100 transition-all shadow-xs"
+          className="flex items-center gap-2 px-4 py-2.5 border border-gray-800 hover:border-gray-700 text-gray-350 rounded-full font-bold text-xs bg-gray-950 hover:bg-gray-900 transition-all shadow-xs"
         >
           <RefreshCw className="w-3.5 h-3.5" /> تحديث الحالة يدوياً
         </button>
       </div>
 
       {/* Visual Timeline component */}
-      <div className="bg-white p-8 rounded-3xl shadow-xs border border-gray-100 space-y-8">
+      <div className="bg-gray-900 p-8 rounded-3xl shadow-xs border border-gray-800 space-y-8">
         {statuses.map((step, idx) => {
           const IconComp = step.icon;
           const isCompleted = idx <= currentIdx;
@@ -110,7 +110,7 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
             <div key={step.key} className="relative flex items-start gap-6">
               {/* Connector line */}
               {idx < statuses.length - 1 && (
-                <div className={`absolute top-10 right-5 -mr-0.5 w-1 h-14 bg-gray-100 transition-all duration-300 ${
+                <div className={`absolute top-10 right-5 -mr-0.5 w-1 h-14 bg-gray-800 transition-all duration-300 ${
                   idx < currentIdx ? 'bg-red-600' : ''
                 }`} />
               )}
@@ -119,17 +119,17 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
               <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 shadow-xs shrink-0 transition-all duration-300 ${
                 isCompleted 
                   ? 'bg-red-600 border-red-600 text-white shadow-md' 
-                  : 'bg-white border-gray-200 text-gray-400'
-              } ${isActive ? 'ring-4 ring-red-100 scale-110' : ''}`}>
+                  : 'bg-gray-900 border-gray-800 text-gray-400'
+              } ${isActive ? 'ring-4 ring-red-950/30 scale-110' : ''}`}>
                 <IconComp className="w-5 h-5" />
               </div>
 
               {/* Description texts */}
               <div>
-                <h3 className={`font-bold transition-all duration-300 ${isCompleted ? 'text-gray-900' : 'text-gray-400'}`}>
+                <h3 className={`font-bold transition-all duration-300 ${isCompleted ? 'text-white' : 'text-gray-500'}`}>
                   {step.key === 'PENDING' ? 'تم استلام الطلب' : step.key === 'PREPARING' ? 'تحضير الطلب' : step.key === 'OUT_FOR_DELIVERY' ? 'توصيل الطلب' : 'تم الاكتمال'}
                 </h3>
-                <p className={`text-sm mt-0.5 transition-all duration-300 ${isCompleted ? 'text-gray-600' : 'text-gray-400'}`}>{step.label}</p>
+                <p className={`text-sm mt-0.5 transition-all duration-300 ${isCompleted ? 'text-gray-300' : 'text-gray-500'}`}>{step.label}</p>
               </div>
             </div>
           );
@@ -137,23 +137,23 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
       </div>
 
       {/* Secret Admin panel simulation simulator */}
-      <div className="bg-red-50 p-6 rounded-3xl border border-red-100/70 space-y-4">
+      <div className="bg-red-950/20 p-6 rounded-3xl border border-red-900/40 space-y-4 text-white">
         <div className="flex items-center gap-2">
           <span className="text-xl">⚙️</span>
-          <h4 className="font-bold text-red-950 text-sm">لوحة محاكاة الإدارة (اضغط على الحالات لاختبار تفاعل العميل المباشر)</h4>
+          <h4 className="font-bold text-red-400 text-sm">لوحة محاكاة الإدارة (اضغط على الحالات لاختبار تفاعل العميل المباشر)</h4>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button onClick={() => advanceStatus('PENDING')} className="px-4 py-2.5 bg-white text-gray-700 text-xs font-bold rounded-xl border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all shadow-xs">قيد الانتظار</button>
-          <button onClick={() => advanceStatus('PREPARING')} className="px-4 py-2.5 bg-white text-gray-700 text-xs font-bold rounded-xl border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all shadow-xs">بدء التحضير</button>
-          <button onClick={() => advanceStatus('OUT_FOR_DELIVERY')} className="px-4 py-2.5 bg-white text-gray-700 text-xs font-bold rounded-xl border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all shadow-xs">خروج للتوصيل</button>
-          <button onClick={() => advanceStatus('COMPLETED')} className="px-4 py-2.5 bg-white text-gray-700 text-xs font-bold rounded-xl border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all shadow-xs">تم التوصيل</button>
+          <button onClick={() => advanceStatus('PENDING')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">قيد الانتظار</button>
+          <button onClick={() => advanceStatus('PREPARING')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">بدء التحضير</button>
+          <button onClick={() => advanceStatus('OUT_FOR_DELIVERY')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">خروج للتوصيل</button>
+          <button onClick={() => advanceStatus('COMPLETED')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">تم التوصيل</button>
         </div>
       </div>
 
       <div className="text-center">
         <button 
           onClick={onBackToMenu}
-          className="bg-gray-900 text-white font-bold px-8 py-3.5 rounded-full hover:bg-gray-800 transition-all text-sm shadow-md"
+          className="bg-gray-800 text-white font-bold px-8 py-3.5 rounded-full hover:bg-gray-700 transition-all text-sm shadow-md border border-gray-700"
         >
           الرجوع للمنيو لطلب وجبة أخرى
         </button>
