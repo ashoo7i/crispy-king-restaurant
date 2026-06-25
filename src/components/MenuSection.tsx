@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../config';
 import type { Category, MenuItem } from '../types';
 
-const FALLBACK_CATEGORIES: Category[] = [
+export const FALLBACK_CATEGORIES: Category[] = [
   {
     id: 'cat-burgers',
     name: 'البرجر',
@@ -35,7 +35,7 @@ const FALLBACK_CATEGORIES: Category[] = [
   }
 ];
 
-const FALLBACK_MENU: MenuItem[] = [
+export const FALLBACK_MENU: MenuItem[] = [
   // --- BURGERS ---
   {
     id: 'b1',
@@ -292,9 +292,15 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem }) => {
         }
       } catch (error) {
         console.warn('Backend server unreachable, using local fallback menu data:', error);
-        setCategories(FALLBACK_CATEGORIES);
-        setMenuItems(FALLBACK_MENU);
-        setActiveSlug(FALLBACK_CATEGORIES[0].slug);
+        const storedCats = localStorage.getItem('local_categories');
+        const storedMenu = localStorage.getItem('local_menu_items');
+        const cats = storedCats ? JSON.parse(storedCats) : FALLBACK_CATEGORIES;
+        const menu = storedMenu ? JSON.parse(storedMenu) : FALLBACK_MENU;
+        setCategories(cats);
+        setMenuItems(menu);
+        if (cats.length > 0) {
+          setActiveSlug(cats[0].slug);
+        }
       } finally {
         setLoading(false);
       }
@@ -312,7 +318,7 @@ export const MenuSection: React.FC<MenuSectionProps> = ({ onSelectItem }) => {
 
   const filteredItems = menuItems.filter(item => {
     const cat = categories.find(c => c.id === item.categoryId);
-    return cat?.slug === activeSlug;
+    return cat?.slug === activeSlug && item.isAvailable !== false;
   });
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-12 relative">

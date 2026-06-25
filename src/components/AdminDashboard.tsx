@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../config';
-import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut, Bell, Volume2 } from 'lucide-react';
+import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut, Bell, Volume2, Plus, Edit, Trash2 } from 'lucide-react';
 import { playNewOrderAlert } from '../utils/audio';
+import { FALLBACK_CATEGORIES, FALLBACK_MENU } from './MenuSection';
 
 interface AdminDashboardProps {
   onBackToMenu: () => void;
@@ -65,7 +66,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
-  
+
+  // Tab switching
+  const [activeTab, setActiveTab] = useState<'orders' | 'menu'>('orders');
+
+  // Menu management state
+  const [categories, setCategories] = useState<any[]>([]);
+  const [menuItems, setMenuItems] = useState<any[]>([]);
+
+  // Menu form states
+  const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formName, setFormName] = useState('');
+  const [formDescription, setFormDescription] = useState('');
+  const [formPrice, setFormPrice] = useState('');
+  const [formCalories, setFormCalories] = useState('');
+  const [formImage, setFormImage] = useState('');
+  const [formCategoryId, setFormCategoryId] = useState('');
+  const [formOptions, setFormOptions] = useState<{ name: string; price: number; category: string }[]>([]);
+
   // Notification states
   const [newOrderToast, setNewOrderToast] = useState<any | null>(null);
   const [notificationPermission, setNotificationPermission] = useState<string>(
@@ -139,9 +158,230 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     }
   };
 
+  const fetchMenuData = async () => {
+    try {
+      const catsRes = await fetch(`${API_BASE_URL}/api/categories`);
+      const menuRes = await fetch(`${API_BASE_URL}/api/menu`);
+      if (catsRes.ok && menuRes.ok) {
+        const catsData = await catsRes.json();
+        const menuData = await menuRes.json();
+        setCategories(catsData);
+        setMenuItems(menuData);
+        // Sync locally
+        localStorage.setItem('local_categories', JSON.stringify(catsData));
+        localStorage.setItem('local_menu_items', JSON.stringify(menuData));
+      }
+    } catch (err) {
+      console.warn('Backend server offline, loading local localStorage menu or fallbacks:', err);
+      const localCats = JSON.parse(localStorage.getItem('local_categories') || '[]');
+      const localItems = JSON.parse(localStorage.getItem('local_menu_items') || '[]');
+      setCategories(localCats.length > 0 ? localCats : FALLBACK_CATEGORIES);
+      setMenuItems(localItems.length > 0 ? localItems : FALLBACK_MENU);
+    }
+  };
+
+  const handleOpenForm = (item: any | null) => {
+    setModalError('');
+    setModalSuccess('');
+    if (item) {
+      setEditingItem(item);
+      setFormName(item.name);
+      setFormDescription(item.description || '');
+      setFormPrice(item.price.toString());
+      setFormCalories(item.calories ? item.calories.toString() : '');
+      setFormImage(item.image || '');
+      setFormCategoryId(item.categoryId);
+      setFormOptions(item.options ? item.options.map((opt: any) => ({
+        name: opt.name,
+        price: opt.price,
+        category: opt.category
+      })) : []);
+    } else {
+      setEditingItem(null);
+      setFormName('');
+      setFormDescription('');
+      setFormPrice('');
+      setFormCalories('');
+      setFormImage('');
+      setFormCategoryId(categories[0]?.id || '');
+      setFormOptions([]);
+    }
+    setIsFormOpen(true);
+  };
+
+  const handleAddFormOption = () => {
+    setFormOptions(prev => [...prev, { name: '', price: 0, category: 'ADDON' }]);
+  };
+
+  const handleUpdateFormOption = (index: number, key: string, value: any) => {
+    setFormOptions(prev => prev.map((opt, i) => {
+      if (i === index) {
+        return {
+          ...opt,
+          [key]: key === 'price' ? parseFloat(value) || 0 : value
+        };
+      }
+      return opt;
+    }));
+  };
+
+  const handleRemoveFormOption = (index: number) => {
+    setFormOptions(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleItemAvailability = async (item: any) => {
+    const updatedStatus = !item.isAvailable;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/menu/${item.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isAvailable: updatedStatus })
+      });
+      if (res.ok) {
+        setMenuItems(prev => prev.map(i => i.id === item.id ? { ...i, isAvailable: updatedStatus } : i));
+        // Update local cache
+        const localItems = JSON.parse(localStorage.getItem('local_menu_items') || '[]');
+        const updated = localItems.map((i: any) => i.id === item.id ? { ...i, isAvailable: updatedStatus } : i);
+        localStorage.setItem('local_menu_items', JSON.stringify(updated));
+      } else {
+        throw new Error('Failed to update availability');
+      }
+    } catch (err) {
+      console.warn('Backend server offline, toggling locally:', err);
+      const updated = menuItems.map(i => i.id === item.id ? { ...i, isAvailable: updatedStatus } : i);
+      setMenuItems(updated);
+      localStorage.setItem('local_menu_items', JSON.stringify(updated));
+    }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذا الصنف نهائياً من القائمة؟')) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/menu/${itemId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        setMenuItems(prev => prev.filter(i => i.id !== itemId));
+        // Update local cache
+        const localItems = JSON.parse(localStorage.getItem('local_menu_items') || '[]');
+        const updated = localItems.filter((i: any) => i.id !== itemId);
+        localStorage.setItem('local_menu_items', JSON.stringify(updated));
+      } else {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to delete');
+      }
+    } catch (err: any) {
+      if (err.message && err.message.includes('طلب')) {
+        alert(err.message);
+      } else {
+        console.warn('Backend server offline, deleting locally:', err);
+        const updated = menuItems.filter(i => i.id !== itemId);
+        setMenuItems(updated);
+        localStorage.setItem('local_menu_items', JSON.stringify(updated));
+      }
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setModalError('');
+    setModalSuccess('');
+
+    const itemPayload = {
+      name: formName,
+      description: formDescription,
+      price: parseFloat(formPrice),
+      calories: parseInt(formCalories) || 0,
+      image: formImage || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80',
+      categoryId: formCategoryId,
+      options: formOptions
+    };
+
+    try {
+      let res;
+      if (editingItem) {
+        res = await fetch(`${API_BASE_URL}/api/menu/${editingItem.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemPayload)
+        });
+      } else {
+        res = await fetch(`${API_BASE_URL}/api/menu`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemPayload)
+        });
+      }
+
+      if (res.ok) {
+        const savedItem = await res.json();
+        setModalSuccess('تم حفظ بيانات الوجبة بنجاح!');
+        
+        // Refresh menu list
+        if (editingItem) {
+          setMenuItems(prev => prev.map(i => i.id === editingItem.id ? savedItem : i));
+        } else {
+          setMenuItems(prev => [...prev, savedItem]);
+        }
+
+        // Update local cache
+        const localItems = JSON.parse(localStorage.getItem('local_menu_items') || '[]');
+        if (editingItem) {
+          const idx = localItems.findIndex((i: any) => i.id === editingItem.id);
+          if (idx > -1) localItems[idx] = savedItem;
+          else localItems.push(savedItem);
+        } else {
+          localItems.push(savedItem);
+        }
+        localStorage.setItem('local_menu_items', JSON.stringify(localItems));
+
+        setTimeout(() => {
+          setIsFormOpen(false);
+          setEditingItem(null);
+        }, 1500);
+      } else {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to save item');
+      }
+    } catch (err: any) {
+      console.warn('Backend server offline, saving locally:', err);
+      // Fallback local storage CRUD
+      const updatedMenu = [...menuItems];
+      let mockSavedItem;
+      if (editingItem) {
+        mockSavedItem = {
+          ...editingItem,
+          ...itemPayload,
+          options: formOptions.map((opt, i) => ({ id: `${editingItem.id}-o-${i}`, menuItemId: editingItem.id, ...opt }))
+        };
+        const idx = updatedMenu.findIndex(i => i.id === editingItem.id);
+        if (idx > -1) updatedMenu[idx] = mockSavedItem;
+      } else {
+        const newId = `item-${Date.now()}`;
+        mockSavedItem = {
+          id: newId,
+          ...itemPayload,
+          isAvailable: true,
+          options: formOptions.map((opt, i) => ({ id: `${newId}-o-${i}`, menuItemId: newId, ...opt }))
+        };
+        updatedMenu.push(mockSavedItem);
+      }
+
+      setMenuItems(updatedMenu);
+      localStorage.setItem('local_menu_items', JSON.stringify(updatedMenu));
+      setModalSuccess('تم الحفظ محلياً بنجاح (وضع الأوفلاين)!');
+      
+      setTimeout(() => {
+        setIsFormOpen(false);
+        setEditingItem(null);
+      }, 1500);
+    }
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchOrders();
+      fetchMenuData();
       const interval = setInterval(fetchOrders, 6000);
       return () => clearInterval(interval);
     }
@@ -375,8 +615,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
         </div>
       </div>
 
-      {/* Stats Summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Tab Navigation */}
+      <div className="flex border-b border-gray-800 gap-6 text-sm font-bold pb-2" dir="rtl">
+        <button 
+          onClick={() => setActiveTab('orders')}
+          className={`pb-2 border-b-2 transition-all cursor-pointer ${
+            activeTab === 'orders' ? 'border-red-600 text-white' : 'border-transparent text-gray-400 hover:text-white'
+          }`}
+        >
+          📋 إدارة الطلبات الواردة
+        </button>
+        <button 
+          onClick={() => {
+            setActiveTab('menu');
+            fetchMenuData();
+          }}
+          className={`pb-2 border-b-2 transition-all cursor-pointer ${
+            activeTab === 'menu' ? 'border-red-600 text-white' : 'border-transparent text-gray-400 hover:text-white'
+          }`}
+        >
+          🍔 إدارة قائمة الطعام (المنيو)
+        </button>
+      </div>
+
+      {activeTab === 'orders' && (
+        <>
+          {/* Stats Summary cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800 shadow-xs flex items-center gap-5 text-white">
           <div className="w-12 h-12 bg-red-950/20 text-red-500 rounded-2xl flex items-center justify-center">
             <DollarSign className="w-6 h-6" />
@@ -537,6 +802,263 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
           )}
         </div>
       </div>
+        </>
+      )}
+
+      {activeTab === 'menu' && (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center bg-gray-900 p-6 rounded-3xl border border-gray-800" dir="rtl">
+            <div>
+              <h3 className="font-bold text-white text-lg">قائمة المأكولات والمشروبات 🍔</h3>
+              <p className="text-xs text-gray-400 mt-1">أضف، عدّل أسعار، أو احذف وجبات المطعم من هنا</p>
+            </div>
+            <button
+              onClick={() => handleOpenForm(null)}
+              className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-5 py-3 rounded-2xl transition-all shadow-md cursor-pointer flex items-center gap-1"
+            >
+              <Plus className="w-4 h-4" /> إضافة صنف جديد للمنيو
+            </button>
+          </div>
+
+          {/* Grouped by Category */}
+          <div className="space-y-8" dir="rtl">
+            {categories.map((category) => {
+              const catItems = menuItems.filter(item => item.categoryId === category.id);
+              if (catItems.length === 0) return null;
+
+              return (
+                <div key={category.id} className="bg-gray-900 rounded-3xl border border-gray-800 overflow-hidden shadow-xs">
+                  <div className="p-5 border-b border-gray-800 bg-gray-950/50 flex justify-between items-center">
+                    <h4 className="font-black text-white text-base flex items-center gap-2">
+                      <span>{category.name}</span>
+                      <span className="text-xs text-gray-500 font-bold">({catItems.length} أصناف)</span>
+                    </h4>
+                  </div>
+
+                  <div className="divide-y divide-gray-850">
+                    {catItems.map((item) => (
+                      <div key={item.id} className="p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 w-full md:w-auto">
+                          <img 
+                            src={item.image || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80'} 
+                            alt={item.name} 
+                            className="w-16 h-16 rounded-2xl object-cover border border-gray-800 shrink-0"
+                          />
+                          <div>
+                            <h5 className="font-extrabold text-white text-sm">{item.name}</h5>
+                            <p className="text-xs text-gray-400 mt-1 leading-relaxed max-w-lg line-clamp-1">{item.description}</p>
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="text-[10px] bg-red-950/40 text-red-500 font-bold px-2 py-0.5 rounded-md border border-red-900/30">
+                                {item.calories} سعرة
+                              </span>
+                              {item.options && item.options.length > 0 && (
+                                <span className="text-[10px] bg-blue-950/40 text-blue-500 font-bold px-2 py-0.5 rounded-md border border-blue-900/30">
+                                  {item.options.length} إضافات/أحجام
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t md:border-none pt-3 md:pt-0">
+                          {/* Price & availability */}
+                          <div className="text-right">
+                            <div className="font-black text-red-500 text-sm">{item.price} ريال</div>
+                            <button
+                              onClick={() => toggleItemAvailability(item)}
+                              className={`mt-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full border transition-all cursor-pointer ${
+                                item.isAvailable 
+                                  ? 'bg-green-950/40 text-green-500 border-green-900/50 hover:bg-green-900/20' 
+                                  : 'bg-gray-955 text-gray-500 border-gray-800 hover:bg-gray-900/20'
+                              }`}
+                            >
+                              {item.isAvailable ? '● متاح للطلب' : '○ غير متاح'}
+                            </button>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleOpenForm(item)}
+                              className="px-3.5 py-2 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white rounded-xl text-xs font-bold transition-colors bg-gray-955 cursor-pointer flex items-center gap-1"
+                            >
+                              <Edit className="w-3 h-3" /> تعديل
+                            </button>
+                            <button
+                              onClick={() => handleDeleteItem(item.id)}
+                              className="px-3.5 py-2 bg-red-955 text-red-500 hover:bg-red-950/40 border border-red-900/40 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center gap-1"
+                            >
+                              <Trash2 className="w-3 h-3" /> حذف
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Modal */}
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200 overflow-y-auto">
+          <div className="bg-gray-900 w-full max-w-2xl p-8 rounded-3xl border border-gray-800 shadow-2xl space-y-6 text-right text-white max-h-[90vh] overflow-y-auto" dir="rtl">
+            <h3 className="text-xl font-black text-white border-b border-gray-800 pb-3">
+              {editingItem ? 'تعديل بيانات الوجبة 🍔' : 'إضافة صنف جديد للمنيو ➕'}
+            </h3>
+            
+            <form onSubmit={handleFormSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1.5">اسم الصنف (مثال: برجر دبل تشيز)</label>
+                  <input 
+                    type="text"
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1.5">التصنيف</label>
+                  <select
+                    value={formCategoryId}
+                    onChange={(e) => setFormCategoryId(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    required
+                  >
+                    <option value="">اختر التصنيف...</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1.5">السعر (بالريال اليمني)</label>
+                  <input 
+                    type="number"
+                    value={formPrice}
+                    onChange={(e) => setFormPrice(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1.5">السعرات الحرارية</label>
+                  <input 
+                    type="number"
+                    value={formCalories}
+                    onChange={(e) => setFormCalories(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">رابط صورة الوجبة</label>
+                <input 
+                  type="url"
+                  value={formImage}
+                  onChange={(e) => setFormImage(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">وصف الوجبة</label>
+                <textarea 
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500 h-20 resize-none"
+                />
+              </div>
+
+              {/* Customization Options Editor */}
+              <div className="border-t border-gray-800 pt-4 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-black text-gray-300 block">خيارات التخصيص (الأحجام والإضافات)</span>
+                  <button
+                    type="button"
+                    onClick={handleAddFormOption}
+                    className="text-[10px] bg-gray-850 hover:bg-gray-800 text-white font-bold px-3 py-1.5 rounded-lg border border-gray-800 transition-all cursor-pointer"
+                  >
+                    ➕ إضافة خيار
+                  </button>
+                </div>
+
+                {formOptions.length === 0 ? (
+                  <p className="text-[11px] text-gray-500">لا يوجد خيارات مخصصة لهذا الصنف بعد. يمكنك إضافة أحجام أو إضافات.</p>
+                ) : (
+                  <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                    {formOptions.map((opt, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          placeholder="اسم الخيار (مثال: حجم كبير، جبنة إضافية)"
+                          value={opt.name}
+                          onChange={(e) => handleUpdateFormOption(index, 'name', e.target.value)}
+                          className="flex-1 px-3 py-2 rounded-lg border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
+                          required
+                        />
+                        <input
+                          type="number"
+                          placeholder="السعر الإضافي"
+                          value={opt.price.toString()}
+                          onChange={(e) => handleUpdateFormOption(index, 'price', e.target.value)}
+                          className="w-24 px-3 py-2 rounded-lg border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
+                          required
+                        />
+                        <select
+                          value={opt.category}
+                          onChange={(e) => handleUpdateFormOption(index, 'category', e.target.value)}
+                          className="w-28 px-3 py-2 rounded-lg border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
+                        >
+                          <option value="SIZE">حجم (Size)</option>
+                          <option value="ADDON">إضافة (Addon)</option>
+                          <option value="EXCLUDE">بدون (Exclude)</option>
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFormOption(index)}
+                          className="p-2 text-red-500 hover:bg-red-950/20 rounded-lg transition-colors border border-red-950/30 cursor-pointer text-xs"
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {modalError && <p className="text-xs text-red-500 bg-red-955/20 p-2.5 rounded-xl border border-red-900/50 font-bold">{modalError}</p>}
+              {modalSuccess && <p className="text-xs text-green-500 bg-green-955/20 p-2.5 rounded-xl border border-green-900/50 font-bold">{modalSuccess}</p>}
+
+              <div className="flex gap-3 pt-4 border-t border-gray-800">
+                <button 
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                  className="w-1/2 border border-gray-850 text-gray-300 py-3 rounded-2xl hover:bg-gray-850 font-bold text-xs transition-colors bg-gray-955 cursor-pointer"
+                >
+                  إلغاء
+                </button>
+                <button 
+                  type="submit"
+                  className="w-1/2 bg-red-600 text-white py-3 rounded-2xl hover:bg-red-700 font-bold text-xs transition-all shadow-md shadow-red-950 cursor-pointer"
+                >
+                  حفظ البيانات
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Change Password Modal */}
       {isChangeModalOpen && (
