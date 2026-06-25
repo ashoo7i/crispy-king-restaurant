@@ -94,7 +94,7 @@ async function main() {
   const b3 = await prisma.menuItem.create({
     data: {
       name: 'برجر الجبن المزدوج',
-      description: 'شريحتان من اللحم المشوي مع طبقتين من جبنة الشيدر وصوص عاشو سبايسي.',
+      description: 'شريحتان من اللحم المشوي مع طبقتين من جبنة الشيدر وصوص Ashoospy.',
       price: 4800.0,
       calories: 780,
       image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500&q=80',

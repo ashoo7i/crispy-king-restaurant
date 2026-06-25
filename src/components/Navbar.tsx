@@ -44,7 +44,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('home')}>
           <img src="/logo.png" alt="Logo" className="w-12 h-12 rounded-full object-cover border border-gray-800" />
           <span className="font-display font-black text-2xl tracking-tight text-white">
-            عاشو<span className="text-red-600">سبايسي</span>
+            Ashoo<span className="text-red-600">spy</span>
           </span>
         </div>
 
