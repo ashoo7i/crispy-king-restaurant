@@ -42,11 +42,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         
         {/* Brand/Logo */}
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('home')}>
-          <span className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center text-white font-extrabold text-2xl shadow-md border-2 border-white ring-2 ring-red-600">
-            C
-          </span>
+          <img src="/logo.png" alt="Logo" className="w-12 h-12 rounded-full object-cover border border-gray-800" />
           <span className="font-display font-black text-2xl tracking-tight text-white">
-            كرسبي<span className="text-red-600">كينج</span>
+            عاشو<span className="text-red-600">سبايسي</span>
           </span>
         </div>
 

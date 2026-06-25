@@ -73,7 +73,7 @@ export const FALLBACK_MENU: MenuItem[] = [
   {
     id: 'b3',
     name: 'برجر الجبن المزدوج',
-    description: 'شريحتان من اللحم المشوي مع طبقتين من جبنة الشيدر وصوص كرسبي كينج.',
+    description: 'شريحتان من اللحم المشوي مع طبقتين من جبنة الشيدر وصوص عاشو سبايسي.',
     price: 4800.0,
     calories: 780,
     image: 'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500&q=80',

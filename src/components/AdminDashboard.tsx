@@ -661,7 +661,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pb-6 border-b border-gray-800">
         <div>
-          <h2 className="text-3xl font-black text-white">لوحة تحكم كرسبي كينج 👑</h2>
+          <h2 className="text-3xl font-black text-white">لوحة تحكم عاشو سبايسي 👑</h2>
           <p className="text-sm text-gray-400 mt-1">إدارة ومراقبة الطلبات الحية وتحديث حالة التسليم للعملاء</p>
         </div>
         <div className="flex flex-wrap gap-2.5">

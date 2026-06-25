@@ -134,7 +134,7 @@ function App() {
             </div>
             
             <div className="mt-16 text-center">
-              <h2 className="text-3xl font-display font-black text-white">لماذا كرسبي كينج؟</h2>
+              <h2 className="text-3xl font-display font-black text-white">لماذا عاشو سبايسي؟</h2>
               <p className="mt-4 text-gray-300 max-w-xl mx-auto">نصنع كل وجبة بشغف وعناية فائقة، باستخدام أجود صدور الدجاج الطازجة والمقرمشة يومياً!</p>
               <button 
                 onClick={() => onNavigate('menu')} 
@@ -191,7 +191,7 @@ function App() {
 
       <footer className="bg-gray-900 text-white py-12 mt-20 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 text-center sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-400">© 2026 كرسبي كينج. جميع الحقوق محفوظة. | Developed by Eng. Ashraf Qusailah</p>
+          <p className="text-sm text-gray-400">© 2026 عاشو سبايسي. جميع الحقوق محفوظة. | Developed by Eng. Ashraf Qusailah</p>
           <button 
             onClick={() => onNavigate('admin')}
             className="text-xs text-gray-500 hover:text-red-500 transition-colors"
