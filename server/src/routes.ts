@@ -283,4 +283,41 @@ router.delete('/menu/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Get Settings
+router.get('/settings', async (req: Request, res: Response) => {
+  try {
+    const settings = await prisma.setting.findMany();
+    const settingsMap = settings.reduce((acc: any, s) => {
+      acc[s.key] = s.value;
+      return acc;
+    }, {});
+    res.json(settingsMap);
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+// Update Settings
+router.post('/settings', async (req: Request, res: Response) => {
+  const { settings } = req.body;
+  if (!settings) {
+    return res.status(400).json({ error: 'Settings object is required' });
+  }
+  try {
+    const upserts = Object.entries(settings).map(([key, value]) => {
+      return prisma.setting.upsert({
+        where: { key },
+        update: { value: String(value) },
+        create: { key, value: String(value) }
+      });
+    });
+    await Promise.all(upserts);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating settings:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
 export default router;

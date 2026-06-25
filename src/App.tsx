@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 import { MarqueeScroller } from './components/MarqueeScroller';
@@ -10,6 +10,7 @@ import { OrderTracker } from './components/OrderTracker';
 import { AdminDashboard } from './components/AdminDashboard';
 import type { CartItem, MenuItem, CustomizationOption } from './types';
 import { playSuccessPing } from './utils/audio';
+import { API_BASE_URL } from './config';
 
 function App() {
   const [activePage, setActivePage] = useState<string>('home');
@@ -17,6 +18,39 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+
+  const [heroSettings, setHeroSettings] = useState({
+    hero_title: 'Crunch it &\nLive the Deliciousness!',
+    hero_subtitle: 'قرمشها وعيش اللذاذة',
+    hero_image: '/hero-bg.jpg'
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/settings`);
+        if (res.ok) {
+          const data = await res.json();
+          const settings = {
+            hero_title: data.hero_title || 'Crunch it &\nLive the Deliciousness!',
+            hero_subtitle: data.hero_subtitle || 'قرمشها وعيش اللذاذة',
+            hero_image: data.hero_image || '/hero-bg.jpg'
+          };
+          setHeroSettings(settings);
+          localStorage.setItem('local_settings', JSON.stringify(settings));
+        }
+      } catch (err) {
+        console.warn('Backend server offline, loading local settings:', err);
+        const localSettings = JSON.parse(localStorage.getItem('local_settings') || '{}');
+        setHeroSettings({
+          hero_title: localSettings.hero_title || 'Crunch it &\nLive the Deliciousness!',
+          hero_subtitle: localSettings.hero_subtitle || 'قرمشها وعيش اللذاذة',
+          hero_image: localSettings.hero_image || '/hero-bg.jpg'
+        });
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -89,7 +123,12 @@ function App() {
       <main className="flex-1">
         {activePage === 'home' && (
           <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            <HeroSection onOrderClick={() => onNavigate('menu')} />
+            <HeroSection 
+              onOrderClick={() => onNavigate('menu')} 
+              title={heroSettings.hero_title}
+              subtitle={heroSettings.hero_subtitle}
+              backgroundImage={heroSettings.hero_image}
+            />
             <div className="mt-8">
               <MarqueeScroller />
             </div>

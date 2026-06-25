@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../config';
-import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut, Bell, Volume2, Plus, Edit, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut, Bell, Volume2, Plus, Edit, Trash2, Layout } from 'lucide-react';
 import { playNewOrderAlert } from '../utils/audio';
 import { FALLBACK_CATEGORIES, FALLBACK_MENU } from './MenuSection';
+import { compressImage } from '../utils/image';
 
 interface AdminDashboardProps {
   onBackToMenu: () => void;
@@ -68,7 +69,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   // Tab switching
-  const [activeTab, setActiveTab] = useState<'orders' | 'menu'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'homepage'>('orders');
+
+  // Homepage setting states
+  const [homeHeroTitle, setHomeHeroTitle] = useState('');
+  const [homeHeroSubtitle, setHomeHeroSubtitle] = useState('');
+  const [homeHeroImage, setHomeHeroImage] = useState('');
+  const [isSavingHomepage, setIsSavingHomepage] = useState(false);
+  const [homepageSuccess, setHomepageSuccess] = useState('');
+  const [homepageError, setHomepageError] = useState('');
 
   // Menu management state
   const [categories, setCategories] = useState<any[]>([]);
@@ -177,6 +186,84 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
       const localItems = JSON.parse(localStorage.getItem('local_menu_items') || '[]');
       setCategories(localCats.length > 0 ? localCats : FALLBACK_CATEGORIES);
       setMenuItems(localItems.length > 0 ? localItems : FALLBACK_MENU);
+    }
+  };
+
+  const fetchHomepageSettings = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/settings`);
+      if (res.ok) {
+        const data = await res.json();
+        setHomeHeroTitle(data.hero_title || 'Crunch it &\nLive the Deliciousness!');
+        setHomeHeroSubtitle(data.hero_subtitle || 'قرمشها وعيش اللذاذة');
+        setHomeHeroImage(data.hero_image || '/hero-bg.jpg');
+      }
+    } catch (err) {
+      console.warn('Backend server offline, loading local settings:', err);
+      const localSettings = JSON.parse(localStorage.getItem('local_settings') || '{}');
+      setHomeHeroTitle(localSettings.hero_title || 'Crunch it &\nLive the Deliciousness!');
+      setHomeHeroSubtitle(localSettings.hero_subtitle || 'قرمشها وعيش اللذاذة');
+      setHomeHeroImage(localSettings.hero_image || '/hero-bg.jpg');
+    }
+  };
+
+  const handleSaveHomepage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingHomepage(true);
+    setHomepageError('');
+    setHomepageSuccess('');
+
+    const payload = {
+      settings: {
+        hero_title: homeHeroTitle,
+        hero_subtitle: homeHeroSubtitle,
+        hero_image: homeHeroImage
+      }
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        setHomepageSuccess('تم حفظ إعدادات الواجهة الرئيسية بنجاح!');
+        localStorage.setItem('local_settings', JSON.stringify(payload.settings));
+      } else {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Failed to save settings');
+      }
+    } catch (err: any) {
+      console.warn('Backend server offline, saving homepage locally:', err);
+      localStorage.setItem('local_settings', JSON.stringify(payload.settings));
+      setHomepageSuccess('تم الحفظ محلياً بنجاح (وضع الأوفلاين)!');
+    } finally {
+      setIsSavingHomepage(false);
+    }
+  };
+
+  const handleHeroImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await compressImage(file);
+      setHomeHeroImage(base64);
+    } catch (err) {
+      console.error('Failed to compress hero image:', err);
+      alert('فشل في معالجة وضغط الصورة، يرجى المحاولة بصورة أخرى.');
+    }
+  };
+
+  const handleMenuItemImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await compressImage(file);
+      setFormImage(base64);
+    } catch (err) {
+      console.error('Failed to compress menu item image:', err);
+      alert('فشل في معالجة وضغط الصورة، يرجى المحاولة بصورة أخرى.');
     }
   };
 
@@ -382,6 +469,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     if (isAuthenticated) {
       fetchOrders();
       fetchMenuData();
+      fetchHomepageSettings();
       const interval = setInterval(fetchOrders, 6000);
       return () => clearInterval(interval);
     }
@@ -635,6 +723,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
           }`}
         >
           🍔 إدارة قائمة الطعام (المنيو)
+        </button>
+        <button 
+          onClick={() => {
+            setActiveTab('homepage');
+            fetchHomepageSettings();
+          }}
+          className={`pb-2 border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'homepage' ? 'border-red-600 text-white' : 'border-transparent text-gray-400 hover:text-white'
+          }`}
+        >
+          <Layout className="w-3.5 h-3.5" /> إدارة الواجهة الرئيسية
         </button>
       </div>
 
@@ -902,6 +1001,86 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
         </div>
       )}
 
+      {activeTab === 'homepage' && (
+        <div className="space-y-6" dir="rtl">
+          <div className="bg-gray-900 p-6 rounded-3xl border border-gray-800">
+            <h3 className="font-bold text-white text-lg">إدارة الواجهة الرئيسية للموقع 📋</h3>
+            <p className="text-xs text-gray-400 mt-1">عدل النصوص وصورة الخلفية للبانر الرئيسي في الصفحة الرئيسية</p>
+          </div>
+
+          <form onSubmit={handleSaveHomepage} className="bg-gray-900 p-8 rounded-3xl border border-gray-800 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">عنوان البانر الرئيسي (يمكن استخدام أسطر جديدة)</label>
+                <textarea 
+                  value={homeHeroTitle}
+                  onChange={(e) => setHomeHeroTitle(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500 h-28 resize-none"
+                  placeholder="مثال: Crunch it & \nLive the Deliciousness!"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-gray-400 block mb-1.5">العنوان الفرعي (العربي)</label>
+                <input 
+                  type="text"
+                  value={homeHeroSubtitle}
+                  onChange={(e) => setHomeHeroSubtitle(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="مثال: قرمشها وعيش اللذاذة"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-gray-800 pt-6 space-y-4">
+              <span className="text-xs font-black text-gray-300 block">صورة خلفية البانر الرئيسي</span>
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                {homeHeroImage && (
+                  <div className="relative w-48 h-28 rounded-xl overflow-hidden border border-gray-800 shrink-0">
+                    <img src={homeHeroImage} alt="Hero Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex-1 w-full space-y-3">
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 block mb-1.5">اختر صورة من جهازك للرفع</label>
+                    <input 
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHeroImageChange}
+                      className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-red-955 file:text-red-500 hover:file:bg-red-900/20 file:cursor-pointer border border-gray-800 p-2.5 rounded-xl bg-gray-955"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-400 block mb-1.5">أو أدخل رابط صورة مباشر</label>
+                    <input 
+                      type="text"
+                      value={homeHeroImage}
+                      onChange={(e) => setHomeHeroImage(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {homepageError && <p className="text-xs text-red-500 bg-red-955/20 p-2.5 rounded-xl border border-red-900/50 font-bold">{homepageError}</p>}
+            {homepageSuccess && <p className="text-xs text-green-500 bg-green-955/20 p-2.5 rounded-xl border border-green-900/50 font-bold">{homepageSuccess}</p>}
+
+            <div className="border-t border-gray-800 pt-6 flex justify-end">
+              <button 
+                type="submit"
+                disabled={isSavingHomepage}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-8 py-3 rounded-2xl transition-all shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {isSavingHomepage ? 'جاري الحفظ...' : 'حفظ إعدادات الواجهة'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Add/Edit Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200 overflow-y-auto">
@@ -960,15 +1139,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-gray-400 block mb-1.5">رابط صورة الوجبة</label>
-                <input 
-                  type="url"
-                  value={formImage}
-                  onChange={(e) => setFormImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-sm font-bold bg-gray-955 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                />
+              <div className="border-t border-gray-800/60 pt-4 space-y-4">
+                <span className="text-xs font-black text-gray-300 block">صورة الوجبة</span>
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                  {formImage && (
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-gray-800 shrink-0 bg-gray-955">
+                      <img src={formImage} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 w-full space-y-2">
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-400 block mb-1">اختر صورة من جهازك للرفع</label>
+                      <input 
+                        type="file"
+                        accept="image/*"
+                        onChange={handleMenuItemImageChange}
+                        className="w-full text-xs text-gray-400 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-red-955 file:text-red-500 hover:file:bg-red-900/20 file:cursor-pointer border border-gray-800 p-2 rounded-lg bg-gray-955"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-400 block mb-1">أو أدخل رابط صورة مباشر</label>
+                      <input 
+                        type="text"
+                        value={formImage}
+                        onChange={(e) => setFormImage(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full px-4 py-2 rounded-xl border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div>

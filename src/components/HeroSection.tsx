@@ -2,15 +2,18 @@ import { motion } from 'motion/react';
 
 interface HeroSectionProps {
   onOrderClick: () => void;
+  title: string;
+  subtitle: string;
+  backgroundImage: string;
 }
 
-export const HeroSection = ({ onOrderClick }: HeroSectionProps) => {
+export const HeroSection = ({ onOrderClick, title, subtitle, backgroundImage }: HeroSectionProps) => {
   return (
     <section className="relative w-full max-w-[1400px] mx-auto rounded-[48px] bg-gray-950 overflow-hidden h-[600px] flex flex-col border-none shadow-[0_40px_100px_-20px_rgba(0,0,0,0.2)]">
       {/* Background Image Layer */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none">
         <img
-          src="/hero-bg.jpg"
+          src={backgroundImage || "/hero-bg.jpg"}
           alt="Background"
           className="w-full h-full object-cover scale-100"
         />
@@ -18,7 +21,6 @@ export const HeroSection = ({ onOrderClick }: HeroSectionProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent" />
       </div>
 
-      {/* Hero Text & Button Content (Centered at the bottom replacing the old white template menu) */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 text-center w-full max-w-2xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -27,13 +29,13 @@ export const HeroSection = ({ onOrderClick }: HeroSectionProps) => {
           className="flex flex-col items-center gap-3.5"
         >
           {/* Headline */}
-          <h1 className="font-display text-[32px] md:text-[50px] font-black leading-[1.15] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]">
-            Crunch it &<br />Live the Deliciousness!
+          <h1 className="font-display text-[32px] md:text-[50px] font-black leading-[1.15] tracking-tight text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] whitespace-pre-line">
+            {title || `Crunch it &\nLive the Deliciousness!`}
           </h1>
 
           {/* Subheadline */}
           <p className="font-sans text-[16px] md:text-[20px] font-black text-red-500 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
-            قرمشها وعيش اللذاذة
+            {subtitle || 'قرمشها وعيش اللذاذة'}
           </p>
 
           {/* Centered Order Button replacing the white template bar */}
