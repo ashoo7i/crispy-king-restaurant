@@ -22,6 +22,7 @@ router.get('/orders', async (req: Request, res: Response) => {
     });
     res.json(orders);
   } catch (error) {
+    console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
@@ -32,6 +33,7 @@ router.get('/categories', async (req: Request, res: Response) => {
     const categories = await prisma.category.findMany();
     res.json(categories);
   } catch (error) {
+    console.error('Error fetching categories:', error);
     res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
@@ -44,6 +46,7 @@ router.get('/menu', async (req: Request, res: Response) => {
     });
     res.json(items);
   } catch (error) {
+    console.error('Error fetching menu:', error);
     res.status(500).json({ error: 'Failed to fetch menu' });
   }
 });
@@ -104,6 +107,7 @@ router.get('/orders/:id', async (req: Request, res: Response) => {
 
     res.json(order);
   } catch (error) {
+    console.error('Error fetching order:', error);
     res.status(500).json({ error: 'Failed to fetch order' });
   }
 });
@@ -124,6 +128,7 @@ router.patch('/orders/:id/status', async (req: Request, res: Response) => {
     });
     res.json(updatedOrder);
   } catch (error) {
+    console.error('Error updating order status:', error);
     res.status(500).json({ error: 'Failed to update order status' });
   }
 });
@@ -142,6 +147,7 @@ router.post('/admin/login', async (req: Request, res: Response) => {
       res.status(401).json({ success: false, error: 'كلمة المرور غير صحيحة' });
     }
   } catch (error) {
+    console.error('Error during admin login:', error);
     res.status(500).json({ success: false, error: 'فشل التحقق من كلمة المرور' });
   }
 });
@@ -164,6 +170,7 @@ router.post('/admin/change-password', async (req: Request, res: Response) => {
     });
     res.json({ success: true });
   } catch (error) {
+    console.error('Error changing admin password:', error);
     res.status(500).json({ success: false, error: 'فشل تغيير كلمة المرور' });
   }
 });
