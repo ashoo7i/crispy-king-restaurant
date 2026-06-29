@@ -59,7 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-gray-950/95 backdrop-blur-md border-b border-gray-900 shadow-sm">
+    <>
+      <header className="sticky top-0 z-40 w-full bg-gray-950/95 backdrop-blur-md border-b border-gray-900 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         {/* Brand/Logo */}
@@ -118,6 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
       </div>
+    </header>
 
       {/* My Orders Modal */}
       {isOrdersModalOpen && (
@@ -227,6 +229,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 };
