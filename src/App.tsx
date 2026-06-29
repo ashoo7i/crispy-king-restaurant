@@ -19,10 +19,25 @@ function App() {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
-  const [heroSettings, setHeroSettings] = useState({
-    hero_title: 'Crunch it &\nLive the Deliciousness!',
-    hero_subtitle: 'قرمشها وعيش اللذاذة',
-    hero_image: '/hero-bg.jpg'
+  const [heroSettings, setHeroSettings] = useState(() => {
+    try {
+      const local = localStorage.getItem('local_settings');
+      if (local) {
+        const parsed = JSON.parse(local);
+        return {
+          hero_title: parsed.hero_title || 'Crunch it &\nLive the Deliciousness!',
+          hero_subtitle: parsed.hero_subtitle || 'قرمشها وعيش اللذاذة',
+          hero_image: parsed.hero_image || '/hero-bg.jpg'
+        };
+      }
+    } catch (e) {
+      console.warn('Error loading settings from localStorage:', e);
+    }
+    return {
+      hero_title: 'Crunch it &\nLive the Deliciousness!',
+      hero_subtitle: 'قرمشها وعيش اللذاذة',
+      hero_image: '/hero-bg.jpg'
+    };
   });
 
   useEffect(() => {

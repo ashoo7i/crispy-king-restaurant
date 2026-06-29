@@ -72,9 +72,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
   const [activeTab, setActiveTab] = useState<'orders' | 'menu' | 'homepage'>('orders');
 
   // Homepage setting states
-  const [homeHeroTitle, setHomeHeroTitle] = useState('');
-  const [homeHeroSubtitle, setHomeHeroSubtitle] = useState('');
-  const [homeHeroImage, setHomeHeroImage] = useState('');
+  const [homeHeroTitle, setHomeHeroTitle] = useState(() => {
+    try {
+      const local = localStorage.getItem('local_settings');
+      if (local) {
+        return JSON.parse(local).hero_title || 'Crunch it &\nLive the Deliciousness!';
+      }
+    } catch {}
+    return 'Crunch it &\nLive the Deliciousness!';
+  });
+  const [homeHeroSubtitle, setHomeHeroSubtitle] = useState(() => {
+    try {
+      const local = localStorage.getItem('local_settings');
+      if (local) {
+        return JSON.parse(local).hero_subtitle || 'قرمشها وعيش اللذاذة';
+      }
+    } catch {}
+    return 'قرمشها وعيش اللذاذة';
+  });
+  const [homeHeroImage, setHomeHeroImage] = useState(() => {
+    try {
+      const local = localStorage.getItem('local_settings');
+      if (local) {
+        return JSON.parse(local).hero_image || '/hero-bg.jpg';
+      }
+    } catch {}
+    return '/hero-bg.jpg';
+  });
   const [isSavingHomepage, setIsSavingHomepage] = useState(false);
   const [homepageSuccess, setHomepageSuccess] = useState('');
   const [homepageError, setHomepageError] = useState('');
