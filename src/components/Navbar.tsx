@@ -121,8 +121,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* My Orders Modal */}
       {isOrdersModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-          <div className="bg-gray-900 w-full max-w-lg p-6 rounded-3xl border border-gray-800 shadow-2xl space-y-4 text-right flex flex-col max-h-[80vh] text-white" dir="rtl">
+        <div 
+          className="fixed inset-0 bg-black/75 backdrop-blur-xs overflow-y-auto flex items-start sm:items-center justify-center p-4 z-50 animate-in fade-in duration-200"
+          onClick={() => setIsOrdersModalOpen(false)}
+        >
+          <div 
+            className="bg-gray-900 w-full max-w-lg p-6 rounded-3xl border border-gray-800 shadow-2xl space-y-4 text-right flex flex-col max-h-[80vh] text-white my-8 sm:my-0" 
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+          >
             
             {/* Modal Header */}
             <div className="flex justify-between items-center border-b border-gray-800 pb-3">
@@ -196,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                       <button 
                         onClick={() => handleTrackSingleOrder(order.id)}
-                        className="w-full sm:w-auto flex items-center justify-center gap-1 bg-gray-950 hover:bg-red-600 hover:text-white border border-gray-800 hover:border-red-600 text-gray-300 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all"
+                        className="w-full sm:w-auto flex items-center justify-center gap-1 bg-gray-950 hover:bg-red-600 hover:text-white border border-gray-800 hover:border-red-600 text-gray-350 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all"
                       >
                         <span>تتبع حالة الطلب</span>
                         <ArrowLeft className="w-3.5 h-3.5" />
@@ -206,6 +213,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 })
               )}
             </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-gray-800 pt-3 flex justify-end">
+              <button 
+                onClick={() => setIsOrdersModalOpen(false)}
+                className="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 rounded-xl text-xs transition-colors cursor-pointer"
+              >
+                إغلاق النافذة
+              </button>
+            </div>
+
           </div>
         </div>
       )}
