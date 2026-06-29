@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../config';
 import { Clock, CheckCircle2, DollarSign, Eye, RefreshCw, Lock, ShieldAlert, KeyRound, LogOut, Bell, Volume2, Plus, Edit, Trash2, Layout } from 'lucide-react';
-import { playNewOrderAlert } from '../utils/audio';
+import { playNewOrderAlert, playPendingOrderReminder } from '../utils/audio';
 import { FALLBACK_CATEGORIES, FALLBACK_MENU } from './MenuSection';
 import { compressImage } from '../utils/image';
 
@@ -498,6 +498,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
       return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    // Check if there are any pending orders
+    const hasPending = orders.some(o => o.status === 'PENDING');
+    
+    if (hasPending) {
+      const interval = setInterval(() => {
+        playPendingOrderReminder();
+        
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification('⚠️ تنبيه: طلبات قيد الانتظار!', {
+            body: 'يوجد طلب معلق يحتاج للمراجعة والقبول في لوحة التحكم.',
+            icon: '/logo.png'
+          });
+        }
+      }, 60000); // 1 minute (60 seconds)
+      
+      return () => clearInterval(interval);
+    }
+  }, [orders, isAuthenticated]);
 
   // Handle authentication login
   const handleLogin = async (e: React.FormEvent) => {
