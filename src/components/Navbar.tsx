@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingBag, ClipboardList, X, ArrowLeft, Clock } from 'lucide-react';
 
 interface NavbarProps {
@@ -18,6 +18,28 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
   const [myOrders, setMyOrders] = useState<any[]>([]);
+  const [logoClickCount, setLogoClickCount] = useState(0);
+
+  useEffect(() => {
+    if (logoClickCount > 0) {
+      const timer = setTimeout(() => {
+        setLogoClickCount(0);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [logoClickCount]);
+
+  const handleLogoClick = () => {
+    setLogoClickCount(prev => {
+      const next = prev + 1;
+      if (next >= 5) {
+        onNavigate('admin');
+        return 0;
+      }
+      return next;
+    });
+    onNavigate('home');
+  };
 
   // Open modal and load orders from localStorage
   const handleOpenOrdersModal = () => {
@@ -41,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         
         {/* Brand/Logo */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => onNavigate('home')}>
+        <div className="flex items-center gap-3 cursor-pointer" onClick={handleLogoClick}>
           <img src="/logo.png" alt="Logo" className="w-12 h-12 rounded-full object-cover border border-gray-800" />
           <span className="font-display font-black text-2xl tracking-tight text-white">
             Ashoo<span className="text-red-600">spy</span>
