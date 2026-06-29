@@ -13,6 +13,8 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
   const [loading, setLoading] = useState(true);
   const [prevStatus, setPrevStatus] = useState<string | null>(null);
 
+  const isAdmin = typeof window !== 'undefined' && sessionStorage.getItem('admin_authenticated') === 'true';
+
   const fetchOrder = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
@@ -178,18 +180,20 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
       </div>
 
       {/* Secret Admin panel simulation simulator */}
-      <div className="bg-red-950/20 p-6 rounded-3xl border border-red-900/40 space-y-4 text-white">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">⚙️</span>
-          <h4 className="font-bold text-red-400 text-sm">لوحة محاكاة الإدارة (اضغط على الحالات لاختبار تفاعل العميل المباشر)</h4>
+      {isAdmin && (
+        <div className="bg-red-950/20 p-6 rounded-3xl border border-red-900/40 space-y-4 text-white">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">⚙️</span>
+            <h4 className="font-bold text-red-400 text-sm">لوحة محاكاة الإدارة (اضغط على الحالات لاختبار تفاعل العميل المباشر)</h4>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => advanceStatus('PENDING')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">قيد الانتظار</button>
+            <button onClick={() => advanceStatus('PREPARING')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">بدء التحضير</button>
+            <button onClick={() => advanceStatus('OUT_FOR_DELIVERY')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">خروج للتوصيل</button>
+            <button onClick={() => advanceStatus('COMPLETED')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">تم التوصيل</button>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => advanceStatus('PENDING')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">قيد الانتظار</button>
-          <button onClick={() => advanceStatus('PREPARING')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">بدء التحضير</button>
-          <button onClick={() => advanceStatus('OUT_FOR_DELIVERY')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">خروج للتوصيل</button>
-          <button onClick={() => advanceStatus('COMPLETED')} className="px-4 py-2.5 bg-gray-950 text-gray-350 text-xs font-bold rounded-xl border border-gray-850 hover:bg-gray-900 active:scale-95 transition-all shadow-xs">تم التوصيل</button>
-        </div>
-      </div>
+      )}
 
       <div className="text-center">
         <button 
