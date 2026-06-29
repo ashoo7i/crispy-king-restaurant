@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../config';
 import { CheckCircle2, Clock, Truck, ShieldCheck, RefreshCw } from 'lucide-react';
+import { playPreparingChime, playDeliveryChime, playCompletedChime } from '../utils/audio';
 
 interface OrderTrackerProps {
   orderId: string;
@@ -10,6 +11,7 @@ interface OrderTrackerProps {
 export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMenu }) => {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [prevStatus, setPrevStatus] = useState<string | null>(null);
 
   const fetchOrder = async () => {
     try {
@@ -55,6 +57,35 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
     return () => clearInterval(interval);
   }, [orderId]);
 
+  useEffect(() => {
+    if (order) {
+      if (prevStatus && order.status !== prevStatus) {
+        if (order.status === 'PREPARING') {
+          playPreparingChime();
+        } else if (order.status === 'OUT_FOR_DELIVERY') {
+          playDeliveryChime();
+        } else if (order.status === 'COMPLETED') {
+          playCompletedChime();
+        }
+
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          let bodyText = '';
+          if (order.status === 'PREPARING') bodyText = 'بدأنا في تحضير طلبك بشغف 🍳';
+          else if (order.status === 'OUT_FOR_DELIVERY') bodyText = 'المندوب في طريقه إليك الآن 🛵';
+          else if (order.status === 'COMPLETED') bodyText = 'تم تسليم طلبك بالهناء والشفاء! شكراً لك ❤️';
+          
+          if (bodyText) {
+            new Notification('🔔 تحديث حالة طلبك!', {
+              body: bodyText,
+              icon: '/logo.png'
+            });
+          }
+        }
+      }
+      setPrevStatus(order.status);
+    }
+  }, [order?.status, prevStatus]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-24">
@@ -98,6 +129,16 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({ orderId, onBackToMen
           <RefreshCw className="w-3.5 h-3.5" /> تحديث الحالة يدوياً
         </button>
       </div>
+
+      {order.status === 'COMPLETED' && (
+        <div className="bg-gradient-to-r from-red-900/40 via-red-950/20 to-red-900/40 p-8 rounded-3xl border border-red-800/40 text-center space-y-3">
+          <span className="text-4xl block">🍗❤️</span>
+          <h3 className="text-xl font-black text-white">شكراً لطلبك من Ashoospy!</h3>
+          <p className="text-gray-300 text-sm max-w-md mx-auto leading-relaxed">
+            نأمل أن تكون وجبتك مقرمشة ولذيذة وتصنع يومك. نحن فخورون بخدمتك ونتطلع لطلبك القادم!
+          </p>
+        </div>
+      )}
 
       {/* Visual Timeline component */}
       <div className="bg-gray-900 p-8 rounded-3xl shadow-xs border border-gray-800 space-y-8">
