@@ -1,0 +1,68 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id        String     @id @default(uuid())
+  name      String
+  slug      String     @unique
+  image     String
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id          String                @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  calories    Int
+  image       String
+  category    Category              @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  isAvailable Boolean               @default(true)
+  options     CustomizationOption[]
+  orderItems  OrderItem[]
+}
+
+model CustomizationOption {
+  id         String   @id @default(uuid())
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId String
+  name       String
+  price      Float
+  category   String   // SIZE, ADDON, EXCLUDE
+}
+
+model Order {
+  id            String      @id
+  customerName  String
+  customerPhone String
+  deliveryType  String      // DELIVERY, PICKUP
+  address       String?
+  status        String      // PENDING, PREPARING, OUT_FOR_DELIVERY, COMPLETED
+  totalPrice    Float
+  paymentMethod String      @default("CASH") // CASH, CARD, WALLET
+  createdAt     DateTime    @default(now())
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id             String   @id @default(uuid())
+  order          Order    @relation(fields: [orderId], references: [id])
+  orderId        String
+  menuItem       MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId     String
+  quantity       Int
+  price          Float
+  customizations String   // JSON string of selected options
+}
+
+model Setting {
+  key   String @id
+  value String
+}
