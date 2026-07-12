@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
-import { sendWhatsAppNotification } from './whatsapp';
+import { sendWhatsAppNotification } from './whatsapp.js';
 
 const prisma = new PrismaClient();
 const router = Router();
