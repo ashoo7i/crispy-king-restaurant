@@ -1,6 +1,6 @@
 # Walkthrough of Homepage Enhancements
 
-We have successfully updated the homepage to support a background video instead of a static image, merged the `MenuSection` directly onto the homepage, and removed the marquee scroller to clean up the visual experience.
+We have successfully updated the homepage to support a background video instead of a static image, merged the `MenuSection` directly onto the homepage, removed the marquee scroller, and integrated a premium topographic background image across the entire site.
 
 ## Changes Made
 
@@ -21,7 +21,12 @@ We have successfully updated the homepage to support a background video instead 
   - Added state and input controls to configure the homepage background video URL/path (`hero_video`).
   - Integrated saving and loading logic for `hero_video` inside the settings payload.
 
-### 4. Cleanup of Files
+### 4. Topographic Background Pattern (`src/index.css`, `src/App.tsx`)
+- Copied the uploaded red-on-black topographic design to `public/topo-bg.png`.
+- Modified [index.css](file:///c:/Users/asqu2/Desktop/caaar/src/index.css) to apply the pattern to the `body` background with fixed attachment, cover scaling, and a subtle dark gradient overlay for optimal readability.
+- Replaced the solid `bg-gray-950` wrapper in [App.tsx](file:///c:/Users/asqu2/Desktop/caaar/src/App.tsx) with `bg-transparent` to expose the global topographic background pattern.
+
+### 5. Cleanup of Files
 - Deleted `src/components/MarqueeScroller.tsx` as it was no longer needed.
 - Regenerated the clean deliverable package `ashoospy-project.zip` on your Desktop.
 
