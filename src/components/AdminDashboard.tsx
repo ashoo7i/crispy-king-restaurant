@@ -113,6 +113,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
     } catch {}
     return '/hero-bg.jpg';
   });
+  const [homeHeroVideo, setHomeHeroVideo] = useState(() => {
+    try {
+      const local = localStorage.getItem('local_settings');
+      if (local) {
+        return JSON.parse(local).hero_video || '/hero-video.mp4';
+      }
+    } catch {}
+    return '/hero-video.mp4';
+  });
   const [isSavingHomepage, setIsSavingHomepage] = useState(false);
   const [homepageSuccess, setHomepageSuccess] = useState('');
   const [homepageError, setHomepageError] = useState('');
@@ -255,6 +264,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
         setHomeHeroTitle(data.hero_title || 'Crunch it &\nLive the Deliciousness!');
         setHomeHeroSubtitle(data.hero_subtitle || 'قرمشها وعيش اللذاذة');
         setHomeHeroImage(data.hero_image || '/hero-bg.jpg');
+        setHomeHeroVideo(data.hero_video || '/hero-video.mp4');
         setAdminEmail(data.admin_email || 'admin@ashoospy.com');
       }
     } catch (err) {
@@ -263,6 +273,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
       setHomeHeroTitle(localSettings.hero_title || 'Crunch it &\nLive the Deliciousness!');
       setHomeHeroSubtitle(localSettings.hero_subtitle || 'قرمشها وعيش اللذاذة');
       setHomeHeroImage(localSettings.hero_image || '/hero-bg.jpg');
+      setHomeHeroVideo(localSettings.hero_video || '/hero-video.mp4');
       setAdminEmail(localSettings.admin_email || 'admin@ashoospy.com');
     }
   };
@@ -278,6 +289,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
         hero_title: homeHeroTitle,
         hero_subtitle: homeHeroSubtitle,
         hero_image: homeHeroImage,
+        hero_video: homeHeroVideo,
         admin_email: adminEmail
       }
     };
@@ -1362,6 +1374,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                       className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
                     />
                   </div>
+                </div>
+            </div>
+
+            <div className="border-t border-gray-800 pt-6 space-y-4">
+              <span className="text-xs font-black text-gray-300 block">فيديو خلفية البانر الرئيسي</span>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-400 block mb-1.5">رابط أو مسار الفيديو المباشر (MP4)</label>
+                  <input 
+                    type="text"
+                    value={homeHeroVideo}
+                    onChange={(e) => setHomeHeroVideo(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-800 text-xs bg-gray-955 text-white focus:outline-none"
+                    placeholder="مثال: /hero-video.mp4 أو رابط خارجي"
+                  />
                 </div>
               </div>
             </div>
