@@ -1375,6 +1375,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBackToMenu }) 
                     />
                   </div>
                 </div>
+              </div>
             </div>
 
             <div className="border-t border-gray-800 pt-6 space-y-4">
