@@ -5,18 +5,33 @@ interface HeroSectionProps {
   title: string;
   subtitle: string;
   backgroundImage: string;
+  videoUrl?: string;
 }
 
-export const HeroSection = ({ onOrderClick, title, subtitle, backgroundImage }: HeroSectionProps) => {
+export const HeroSection = ({ onOrderClick, title, subtitle, backgroundImage, videoUrl }: HeroSectionProps) => {
+  const defaultVideo = "/hero-video.mp4";
+  const activeVideo = videoUrl || defaultVideo;
+
   return (
     <section className="relative w-full max-w-[1400px] mx-auto rounded-[20px] sm:rounded-[36px] md:rounded-[48px] bg-gray-950 overflow-hidden h-[250px] sm:h-[380px] md:h-[600px] flex flex-col border-none shadow-[0_40px_100px_-20px_rgba(0,0,0,0.2)]">
-      {/* Background Image Layer */}
+      {/* Background Video/Image Layer */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden select-none">
-        <img
-          src={backgroundImage || "/hero-bg.jpg"}
-          alt="Background"
-          className="w-full h-full object-cover object-center scale-100"
-        />
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover object-center"
+          poster={backgroundImage || "/hero-bg.jpg"}
+          key={activeVideo}
+        >
+          <source src={activeVideo} type="video/mp4" />
+          <img
+            src={backgroundImage || "/hero-bg.jpg"}
+            alt="Background Poster"
+            className="w-full h-full object-cover object-center"
+          />
+        </video>
         {/* Dark overlay starting from the bottom for centered text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent" />
       </div>
@@ -38,7 +53,7 @@ export const HeroSection = ({ onOrderClick, title, subtitle, backgroundImage }: 
             {subtitle || 'قرمشها وعيش اللذاذة'}
           </p>
 
-          {/* Centered Order Button replacing the white template bar */}
+          {/* Centered Order Button */}
           <motion.button
             onClick={onOrderClick}
             whileHover={{ scale: 1.05 }}
