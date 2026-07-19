@@ -145,7 +145,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-transparent text-white flex flex-col font-sans">
       <Navbar 
         cartCount={cartCount} 
         onCartToggle={() => setIsCartOpen(!isCartOpen)} 
