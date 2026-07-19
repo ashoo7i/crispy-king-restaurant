@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
-import { MarqueeScroller } from './components/MarqueeScroller';
 import { MenuSection } from './components/MenuSection';
 import { CustomizationModal } from './components/CustomizationModal';
 import { CartDrawer } from './components/CartDrawer';
@@ -27,7 +26,8 @@ function App() {
         return {
           hero_title: parsed.hero_title || 'Crunch it &\nLive the Deliciousness!',
           hero_subtitle: parsed.hero_subtitle || 'قرمشها وعيش اللذاذة',
-          hero_image: parsed.hero_image || '/hero-bg.jpg'
+          hero_image: parsed.hero_image || '/hero-bg.jpg',
+          hero_video: parsed.hero_video || '/hero-video.mp4'
         };
       }
     } catch (e) {
@@ -36,7 +36,8 @@ function App() {
     return {
       hero_title: 'Crunch it &\nLive the Deliciousness!',
       hero_subtitle: 'قرمشها وعيش اللذاذة',
-      hero_image: '/hero-bg.jpg'
+      hero_image: '/hero-bg.jpg',
+      hero_video: '/hero-video.mp4'
     };
   });
 
@@ -49,7 +50,8 @@ function App() {
           const settings = {
             hero_title: data.hero_title || 'Crunch it &\nLive the Deliciousness!',
             hero_subtitle: data.hero_subtitle || 'قرمشها وعيش اللذاذة',
-            hero_image: data.hero_image || '/hero-bg.jpg'
+            hero_image: data.hero_image || '/hero-bg.jpg',
+            hero_video: data.hero_video || '/hero-video.mp4'
           };
           setHeroSettings(settings);
           localStorage.setItem('local_settings', JSON.stringify(settings));
@@ -60,7 +62,8 @@ function App() {
         setHeroSettings({
           hero_title: localSettings.hero_title || 'Crunch it &\nLive the Deliciousness!',
           hero_subtitle: localSettings.hero_subtitle || 'قرمشها وعيش اللذاذة',
-          hero_image: localSettings.hero_image || '/hero-bg.jpg'
+          hero_image: localSettings.hero_image || '/hero-bg.jpg',
+          hero_video: localSettings.hero_video || '/hero-video.mp4'
         });
       }
     };
@@ -76,8 +79,18 @@ function App() {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const onNavigate = (page: string) => {
-    setActivePage(page);
-    window.scrollTo(0, 0);
+    if (page === 'menu') {
+      setActivePage('home');
+      setTimeout(() => {
+        const element = document.getElementById('menu-section');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      setActivePage(page);
+      window.scrollTo(0, 0);
+    }
   };
 
   const handleAddToCart = (item: MenuItem, quantity: number, customizations: CustomizationOption[]) => {
@@ -143,32 +156,25 @@ function App() {
 
       <main className="flex-1">
         {activePage === 'home' && (
-          <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 space-y-16">
             <HeroSection 
               onOrderClick={() => onNavigate('menu')} 
               title={heroSettings.hero_title}
               subtitle={heroSettings.hero_subtitle}
               backgroundImage={heroSettings.hero_image}
+              videoUrl={heroSettings.hero_video}
             />
-            <div className="mt-8">
-              <MarqueeScroller />
-            </div>
             
-            <div className="mt-16 text-center">
+            <div className="text-center py-4">
               <h2 className="text-3xl font-display font-black text-white">لماذا Ashoospy؟</h2>
               <p className="mt-4 text-gray-300 max-w-xl mx-auto">نصنع كل وجبة بشغف وعناية فائقة، باستخدام أجود صدور الدجاج الطازجة والمقرمشة يومياً!</p>
-              <button 
-                onClick={() => onNavigate('menu')} 
-                className="mt-6 bg-red-600 text-white font-bold px-8 py-3.5 rounded-full hover:bg-red-700 shadow-md hover:shadow-lg transition-all"
-              >
-                استكشف المنيو الكامل
-              </button>
+            </div>
+
+            {/* Merged Menu Section on the homepage */}
+            <div id="menu-section" className="pt-8 scroll-mt-24">
+              <MenuSection onSelectItem={(item) => setSelectedItem(item)} />
             </div>
           </div>
-        )}
-
-        {activePage === 'menu' && (
-          <MenuSection onSelectItem={(item) => setSelectedItem(item)} />
         )}
 
         {activePage === 'checkout' && (
